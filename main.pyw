@@ -17,6 +17,7 @@ import socket #Для получения имени компьютера
 from SearchKey import * #Поиск слов купить и т.п. в папке с программой
 from PIL import ImageTk, Image
 
+
 #Получаем данные из реестра в список(словари)
 software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
 
@@ -33,6 +34,21 @@ def close_win():
 def WebStr(self):
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/")
+def UpdateProg():
+    """проверка наличия новой версии программы"""
+    my_version = 0.1
+    try:
+        f = urllib.request.urlopen("https://github.com/mrkaban/LicenseCheker/raw/master/version")
+        h = str(f.read())
+    except:
+        messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
+        return
+    if my_version != h:
+        try:
+            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/raw/master/LicenseCheker.zip")
+        except:
+            messagebox.showerror("Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
+            return
 def UpdateBase():
     """Обновление базы данных Lpro.db"""
     BaseUpdateBase = sqlite3.connect(r"Lpro.db", uri=True)
@@ -67,6 +83,60 @@ def UpdateBase():
             messagebox.showinfo("База данных актуальна", "Обновление базы данных не требуется.")
     CurUpdateBase.close() #Закрываю соединение с базой и с курсором для базы
     BaseUpdateBase.close()
+def ViewBD():
+    """Поиск и просмотр базы данных"""
+    winBD= Toplevel(root)
+    winBD.iconbitmap('LicenseCheker.ico')
+    winBD.resizable(width=False, height=False)
+    winBD.title("Поиск и просмотр базы данных")
+    winBD.minsize(width=400, height=200)
+    #winBD.geometry("900x300")
+    frameBD = Frame(winBD)
+    treeBD = ttk.Treeview(winBD)
+
+    treeBD = ttk.Treeview(frameBD, selectmode='browse')
+
+    scrollbar_vertical = ttk.Scrollbar(frameBD, orient='vertical', command = treeBD.yview)
+
+    scrollbar_vertical.pack(side='right', fill=Y)
+
+    treeBD.configure(yscrollcommand=scrollbar_vertical.set)
+
+    treeBD.pack(side=LEFT, fill=BOTH, expand=False)
+
+    frameBD.pack(expand=False)
+
+    #заполняем таблицу
+    treeBD["columns"]=("Name","Type", "Lic", "Cena")
+    treeBD.column("#0", width=50)
+    treeBD.column("Name", width=300, stretch=True)
+    treeBD.column("Type", width=150, stretch=True)
+    treeBD.column("Lic", width=120, stretch=True)
+    treeBD.column("Cena", width=80, stretch=True)
+    treeBD.heading("#0", text="№:")
+    treeBD.heading("Name", text="Название:")
+    treeBD.heading("Type", text="Тип:")
+    treeBD.heading("Lic", text="Лицензия:")
+    treeBD.heading("Cena", text="~Цена:")
+
+    #Пробую работать с SQLite
+    BaseBD = sqlite3.connect(r"Lpro.db", uri=True)
+    BaseBD.row_factory = sqlite3.Row
+    CurBD = BaseBD.cursor()
+    s = 'SELECT * FROM program'
+    CurBD.execute(s)
+    records = CurBD.fetchall()
+    added = False
+    i = 1
+    for row in records:
+        treeBD.insert("" , i-1, text=i, values=(row[1], row[2], row[3], row[4]))
+        added = True
+        i += 1
+    CurBD.close()
+    BaseBD.close()
+    winBD.resizable(width=False, height=False)
+    treeBD.pack()
+
 def about():
     """окно о программе"""
     winAbout= Toplevel(root)
@@ -438,11 +508,13 @@ pm=Menu(m)
 m.add_cascade(label="Поиск", menu=pm)
 pm.add_command(label="Ручной поиск программ", command=RuchSearchProg)
 pm.add_command(label="Медиа поиск", command=MediaSearch)
+pm.add_command(label="Поиск в базе", command=ViewBD)
 hm=Menu(m)
 m.add_cascade(label="?", menu=hm)
 hm.add_command(label="О программе", command=about)
 hm.add_command(label="Официальный сайт", command=WebStr)
 hm.add_command(label="Обновить базу данных", command=UpdateBase)
+hm.add_command(label="Проверить наличие новой версии", command=UpdateProg)
 
 #Рисуем таблицу основного окна
 tree = ttk.Treeview(root)
