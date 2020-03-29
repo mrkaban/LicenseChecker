@@ -1,1 +1,3 @@
-pyinstaller --onedir --onefile --clean --noconsole --distpath=D:\LicenseCheker --icon=D:\Public\LicenseCheker\LicenseCheker.ico --paths='D:\Public\LicenseCheker\' --name=LicenseCheker "D:\Public\LicenseCheker\main.pyw"
+pyinstaller --onedir --clean --noconsole --distpath=D:\Public\LicenseCheker\0.2\exe --icon=data\LicenseCheker.ico --add-data=data\LicenseCheker.ico;data  --add-data=data\Lpro.db;data  --add-data=data\LicenseCheker.png;data --paths='D:\Public\LicenseCheker\0.2\' --name=LicenseCheker "D:\Public\LicenseCheker\0.2\main.pyw"
+ 
+ cd /d D:\Public\LicenseCheker\0.2

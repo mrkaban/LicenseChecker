@@ -49,6 +49,15 @@ def filter(NameProg):
                     n = edited_NameProg[edited_NameProg.find(f2):]
                     edited_NameProg = edited_NameProg.replace(n, '')
             i += 1
+    i = 0
+    while i < 100:    #Фильтруем 10, 21 и т.п.
+            for cifra in cifri:
+                f = str(i) + cifra
+                f = " " + f
+                if edited_NameProg.find(f, 0, len(edited_NameProg)) >= 1:
+                    n = edited_NameProg[edited_NameProg.find(f):]
+                    edited_NameProg = edited_NameProg.replace(n, '')
+            i += 1
 
     VS_spisok=(" 2015", " 2016", " 2017", " 2018", " 2019", " 2007", " 2008", " 2009", " 2010", " 2011", " 2012",
     " 2013", " 2014", " 2020", " 2021", " 2022") #Чтобы исключить некорректную фильтрацию из Microsoft Visual Studio

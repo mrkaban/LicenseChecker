@@ -23,7 +23,7 @@ software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(win
 
 root = Tk()
 root.title("LicenseCheker - Проверка лицензий установленных программ")
-root.iconbitmap('LicenseCheker.ico')
+root.iconbitmap('data\\LicenseCheker.ico')
 katalog=''
 
 #Функция для меню
@@ -51,7 +51,7 @@ def UpdateProg():
             return
 def UpdateBase():
     """Обновление базы данных Lpro.db"""
-    BaseUpdateBase = sqlite3.connect(r"Lpro.db", uri=True)
+    BaseUpdateBase = sqlite3.connect(r"data\Lpro.db", uri=True)
     BaseUpdateBase.row_factory = sqlite3.Row #подключаем базу данных и курсор
     CurUpdateBase = BaseUpdateBase.cursor()
     s1 = 'SELECT * FROM version WHERE date'
@@ -71,7 +71,7 @@ def UpdateBase():
         if g != h:
             try:
                 bd1 = urllib.request.urlopen("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/images/Lpro.db").read()
-                f = open("Lpro.db", "wb")
+                f = open("data\\Lpro.db", "wb")
                 f.write(bd1)
                 f.close()
                 txt1 = "База данных успешно обновлена до версии " + h + "!"
@@ -86,7 +86,7 @@ def UpdateBase():
 def ViewBD():
     """Поиск и просмотр базы данных"""
     winBD= Toplevel(root)
-    winBD.iconbitmap('LicenseCheker.ico')
+    winBD.iconbitmap('data\\LicenseCheker.ico')
     winBD.resizable(width=False, height=False)
     winBD.title("Поиск и просмотр базы данных")
     winBD.minsize(width=400, height=200)
@@ -120,7 +120,7 @@ def ViewBD():
     treeBD.heading("Cena", text="~Цена:")
 
     #Пробую работать с SQLite
-    BaseBD = sqlite3.connect(r"Lpro.db", uri=True)
+    BaseBD = sqlite3.connect(r"data\Lpro.db", uri=True)
     BaseBD.row_factory = sqlite3.Row
     CurBD = BaseBD.cursor()
     s = 'SELECT * FROM program'
@@ -140,11 +140,11 @@ def ViewBD():
 def about():
     """окно о программе"""
     winAbout= Toplevel(root)
-    winAbout.iconbitmap('LicenseCheker.ico')
+    winAbout.iconbitmap('data\\LicenseCheker.ico')
     winAbout.resizable(width=False, height=False)
     winAbout.title("О программе LicenseCheker")
     winAbout.minsize(width=400, height=100)
-    img = Image.open("LicenseCheker.png")
+    img = Image.open("data\\LicenseCheker.png")
     render = ImageTk.PhotoImage(img)
     initil = Label(winAbout, image=render)
     initil.image = render
@@ -161,7 +161,7 @@ def about():
 def RuchSearchProg():
     """Ручной поиск программ"""
     winRuch= Toplevel(root)
-    winRuch.iconbitmap('LicenseCheker.ico')
+    winRuch.iconbitmap('data\\LicenseCheker.ico')
     winRuch.resizable(width=False, height=False)
     winRuch.title("Ручной поиск программ в указанной директории")
     #winRuch.minsize(width=400, height=200)
@@ -192,7 +192,7 @@ def RuchSearchProg():
                      fullname = os.path.join(root, name) # получаем полное имя файла
                      slovar[name]=fullname
                      spisok.append(name)
-        BaseLproRuch = sqlite3.connect(r"Lpro.db", uri=True)
+        BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
         BaseLproRuch.row_factory = sqlite3.Row #подключаем базу данных и курсор
         CurBLproRuch = BaseLproRuch.cursor()
 
@@ -342,7 +342,7 @@ def SaveAuto():
 def MediaSearch():
     """Ручной поиск программ"""
     winMedia= Toplevel(root)
-    winMedia.iconbitmap('LicenseCheker.ico')
+    winMedia.iconbitmap('data\\LicenseCheker.ico')
     winMedia.resizable(width=False, height=False)
     winMedia.title("Поиск медиа файлов (аудио, видео, изображения) в указанной директории")
     #winMedia.minsize(width=400, height=200)
@@ -547,7 +547,7 @@ tree.heading("Lic", text="Лицензия:")
 tree.heading("Cena", text="~Цена:")
 
 #Пробую работать с SQLite
-BaseLpro = sqlite3.connect(r"Lpro.db", uri=True)
+BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
 BaseLpro.row_factory = sqlite3.Row
 CurBLpro = BaseLpro.cursor()
 IntallPath = {}
@@ -576,7 +576,7 @@ for itemsoft in software_list:
     i += 1
 def DoubleClic(event): #Функция для события двойного клика
     winMore= Toplevel(root)
-    winMore.iconbitmap('LicenseCheker.ico')
+    winMore.iconbitmap('data\\LicenseCheker.ico')
     winMore.resizable(width=False, height=False)
     try:
         s = ([tree.item(x) for x in tree.selection()]) #Получаю выделенную строку
@@ -585,7 +585,7 @@ def DoubleClic(event): #Функция для события двойного к
         winMore.destroy()
         return False
     d = s['values'] #вытаскиваю список из словаря
-    BaseDC = sqlite3.connect(r"Lpro.db", uri=True)
+    BaseDC = sqlite3.connect(r"data\Lpro.db", uri=True)
     BaseDC.row_factory = sqlite3.Row
     CurDC = BaseDC.cursor()
     edited_d = d[0]

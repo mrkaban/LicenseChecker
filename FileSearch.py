@@ -118,7 +118,7 @@ tree.heading("Cena", text="~Цена:")
 #    i += 1
 
 #Пробую работать с SQLite
-BaseLpro = sqlite3.connect(r"Lpro.db", uri=True)
+BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
 BaseLpro.row_factory = sqlite3.Row
 CurBLpro = BaseLpro.cursor()
 
