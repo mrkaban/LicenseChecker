@@ -34,6 +34,15 @@ def filter(NameProg):
             edited_NameProg = edited_NameProg.replace(n, '')
     i = 0
     cifri=("1", "2", "3", "4", "5", "6", "7", "8", "9")
+    while i < 100:    #Фильтруем 10, 21 и т.п.
+            for cifra in cifri:
+                f = str(i) + cifra
+                f = " " + f
+                if edited_NameProg.find(f, 0, len(edited_NameProg)) >= 1:
+                    n = edited_NameProg[edited_NameProg.find(f):]
+                    edited_NameProg = edited_NameProg.replace(n, '')
+            i += 1
+    i = 0
     while i < 100:    #Фильтруем 11.1 и т.п.
             for cifra in cifri:
                 f = str(i) + "."
@@ -47,15 +56,6 @@ def filter(NameProg):
                     edited_NameProg = edited_NameProg.replace(n, '')
                 elif edited_NameProg.find(f2, 0, len(edited_NameProg)) >= 1:
                     n = edited_NameProg[edited_NameProg.find(f2):]
-                    edited_NameProg = edited_NameProg.replace(n, '')
-            i += 1
-    i = 0
-    while i < 100:    #Фильтруем 10, 21 и т.п.
-            for cifra in cifri:
-                f = str(i) + cifra
-                f = " " + f
-                if edited_NameProg.find(f, 0, len(edited_NameProg)) >= 1:
-                    n = edited_NameProg[edited_NameProg.find(f):]
                     edited_NameProg = edited_NameProg.replace(n, '')
             i += 1
 
