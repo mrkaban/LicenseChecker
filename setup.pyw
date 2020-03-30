@@ -11,7 +11,7 @@ excludes = ['asyncio', '', 'collections', 'concurrent', 'distutils', 'email', 'P
 #                          base='Win32GUI',
 #                          icon='data/LicenseCheker.ico')]
 include_files = ['data']
-
+product_name = 'LicenseCheker'
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
@@ -19,19 +19,28 @@ if sys.platform == "win32":
 if 'bdist_msi' in sys.argv:
     sys.argv += ['--initial-target-dir', 'C:\\LicenseCheker']
 
-options = {
+bdist_msi_options = {
     'build_msi': {
         'include_msvcr': True,
+        'upgrade_code': '{66620F3A-DC3A-11E2-B341-002219E9B01E}',
         'include_files': include_files,
         "excludes": excludes,
-        'initial_target_dir': 'C:\\LicenseCheker',
+        'initial_target_dir': r'[ProgramFilesFolder]\%s\%s' % (product_name),
     }
 }
+
+build_exe_options = {
+    'includes': ['data'],
+    "excludes": ['asyncio', '', 'collections', 'concurrent', 'distutils', 'email', 'PyQt5',
+    'shiboken2', 'test', 'unittest', 'libcrypto-1_1'],
+    }
 
 setup(name='LicenseCheker',
       version='0.2',
       description='LicenseCheker',
-      options=options,
+      options={
+          'bdist_msi': bdist_msi_options,
+          'build_exe': build_exe_options}),
       executables = [
         Executable(
             script = "main.pyw",
