@@ -17,32 +17,34 @@ if 'bdist_msi' in sys.argv:
 options = {
     'build_msi': {
         'include_msvcr': True,
-        'upgrade_code': '{66620F3A-DC3A-11E2-B341-002219E9B011}',
-        'product_code': '{66620F3A-DC3A-11E2-B341-002219E9B011}',
+        'upgrade_code': '{66620F3A-DC3A-11E2-B341-002219E9B01E}',
         'include_files': include_files,
         "excludes": excludes,
-    }
+        'initial_target_dir': '[ProgramFilesFolder]\LicenseCheker',
+         }
 }
 
-
 setup(name='LicenseCheker',
-      version='0.3',
-      description='LicenseCheker - Проверка лицензий установленных программ',
-      author = 'mrkaban (КонтинентСвободы.рф)',
-      data_files=[
+      version='0.2',
+      description='LicenseCheker',
+      options=options,
+      data_files=[('data', ['data/LicenseCheker.ico']),
                   ('data', ['data/LicenseCheker.png']),
                   ('data', ['data/Lpro.db']),
-                  ('data', ['data/LicenseCheker.ico']),
+                  ('data', ['data/LicenseCheker.ico'])
                   ],
-      options=options,
-            executables = [
+      #data_files=[('data/LicenseCheker.ico', ['data']),
+      #            ('data/LicenseCheker.png', ['data']),
+      #            ('data/Lpro.db', ['data'])
+      #            ],
+      executables = [
         Executable(
             script = "main.pyw",
-            copyright ='mrkaban (КонтинентСвободы.рф)',
+            copyright="КонтинентСвободы.рф",
             base=base,
             icon="data/LicenseCheker.ico",
             shortcutName="LicenseCheker",
-            shortcutDir='ProgramMenuFolder',
+            shortcutDir="DesktopFolder",
             )
         ]
       )

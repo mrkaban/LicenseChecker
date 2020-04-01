@@ -16,7 +16,7 @@ from datetime import datetime #какая дата и время
 import socket #Для получения имени компьютера
 from SearchKey import * #Поиск слов купить и т.п. в папке с программой
 from PIL import ImageTk, Image
-
+from CheckOS import *
 
 #Получаем данные из реестра в список(словари)
 software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
@@ -29,14 +29,13 @@ katalog=''
 #Функция для меню
 def close_win():
     """Закрываем окно"""
-    #root.destroy()
     sys.exit()
-def WebStr(self):
+def WebStr():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/")
 def UpdateProg():
     """проверка наличия новой версии программы"""
-    my_version = 0.1
+    my_version = 0.3
     try:
         f = urllib.request.urlopen("https://github.com/mrkaban/LicenseCheker/raw/master/version")
         h = str(f.read())
@@ -91,6 +90,40 @@ def ViewBD():
     winBD.title("Поиск и просмотр базы данных")
     winBD.minsize(width=400, height=200)
     #winBD.geometry("900x300")
+    frameBD2 = Frame(winBD)
+
+    L2 = Label(frameBD2, text="Укажите название программы и нажмите кнопку 'Поиск'")
+    L2.pack(side=TOP)
+    L1 = Label(frameBD2, text="Название:")
+    L1.pack(side = LEFT, expand = True)
+    message = StringVar()
+    E1 = Entry(frameBD2, width=50, textvariable=message)
+    E1.pack(side = LEFT, expand = True)
+
+    def ViewBDDlyaKnopki():
+        """Функция для кнопки поиск"""
+        treeBD.delete(*treeBD.get_children())
+        name_user_prog = message.get()
+        BaseLproVDB = sqlite3.connect(r"data\Lpro.db", uri=True)
+        BaseLproVDB.row_factory = sqlite3.Row #подключаем базу данных и курсор
+        CurBLproVDB = BaseLproVDB.cursor()
+        s = 'SELECT * FROM program WHERE (name LIKE "' + name_user_prog + '%%")'
+        CurBLproVDB.execute(s)
+        records = CurBLproVDB.fetchall()
+        added = False
+        i = 1
+        for row in records:
+            treeBD.insert("" , i-1, text=i, values=(row[1], row[2], row[3], row[4]))
+            added = True
+            i += 1
+            if added == False:
+                i = i -1
+        CurBLproVDB.close() #Закрываю соединение с базой и с курсором для базы
+        BaseLproVDB.close()
+
+    btnPoisk = Button(frameBD2, text="Поиск", command=ViewBDDlyaKnopki)
+    btnPoisk.pack(side = LEFT, expand = True)
+    frameBD2.pack(side = TOP, expand=False)
     frameBD = Frame(winBD)
     treeBD = ttk.Treeview(winBD)
 
@@ -102,9 +135,9 @@ def ViewBD():
 
     treeBD.configure(yscrollcommand=scrollbar_vertical.set)
 
-    treeBD.pack(side=LEFT, fill=BOTH, expand=False)
+    treeBD.pack(side = BOTTOM, fill=BOTH, expand=False)
 
-    frameBD.pack(expand=False)
+    frameBD.pack(side = BOTTOM, expand=False)
 
     #заполняем таблицу
     treeBD["columns"]=("Name","Type", "Lic", "Cena")
@@ -118,24 +151,8 @@ def ViewBD():
     treeBD.heading("Type", text="Тип:")
     treeBD.heading("Lic", text="Лицензия:")
     treeBD.heading("Cena", text="~Цена:")
-
-    #Пробую работать с SQLite
-    BaseBD = sqlite3.connect(r"data\Lpro.db", uri=True)
-    BaseBD.row_factory = sqlite3.Row
-    CurBD = BaseBD.cursor()
-    s = 'SELECT * FROM program'
-    CurBD.execute(s)
-    records = CurBD.fetchall()
-    added = False
-    i = 1
-    for row in records:
-        treeBD.insert("" , i-1, text=i, values=(row[1], row[2], row[3], row[4]))
-        added = True
-        i += 1
-    CurBD.close()
-    BaseBD.close()
     winBD.resizable(width=False, height=False)
-    treeBD.pack()
+    treeBD.pack(side = BOTTOM)
 
 def about():
     """окно о программе"""
@@ -175,6 +192,8 @@ def RuchSearchProg():
     E1 = Entry(frameRuch2, width=50, textvariable=message)
     E1.pack(side = LEFT, expand = True)
     slovarSave= {}
+    size_list=[]
+    size2 = None
     def OpenKatalog():
         """Открыть каталог"""
         E1.delete(first=0,last=50)
@@ -182,8 +201,10 @@ def RuchSearchProg():
         E1.insert(0, katalog)
     def PoiskRuchnoiDlyaKnopki():
         """Функция для кнопки поиск"""
+        treeRuch.delete(*treeRuch.get_children()) #очистка содержимого предыдущего поиска
         spisok=[]
         slovar={}
+        size2= 0
         dir = message.get()
         for root, dirs, files in os.walk(dir):
              # пройти по директории рекурсивно
@@ -195,7 +216,6 @@ def RuchSearchProg():
         BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
         BaseLproRuch.row_factory = sqlite3.Row #подключаем базу данных и курсор
         CurBLproRuch = BaseLproRuch.cursor()
-
         added = False #Для отслеживания добавлен вариант из списка или нет
         i = 1
         for itemsoft in spisok: #В списке имена файлом с расширением exe
@@ -206,15 +226,51 @@ def RuchSearchProg():
              records = CurBLproRuch.fetchall()
              for row in records:
                  treeRuch.insert("" , i-1, text=i, values=(slovar[itemsoft], row[1], row[2], row[3], row[4]))
+                 size_list.append(((len(slovar[itemsoft]))*6))
                  #Создаю словари внутри словаря
                  slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                  added = True
-                 break
+                 #break
              i += 1
              if added == False:
                  i = i -1
+                 #Если не найдено в поле file, тогда ищем в поле name
+                 s = 'SELECT * FROM program WHERE (name LIKE "' + NamePF + '%%")'
+                 CurBLproRuch.execute(s)
+                 records = CurBLproRuch.fetchall()
+                 for row in records:
+                     treeRuch.insert("" , i-1, text=i, values=(slovar[itemsoft], row[1], row[2], row[3], row[4]))
+                     #Создаю словари внутри словаря
+                     slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
+                     added = True
+                     #break
+                     i += 1
         CurBLproRuch.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproRuch.close()
+        for itemsize in size_list:
+            if size2 <= int(itemsize):
+                size2 = int(itemsize)
+
+        if size2 == None:
+            size2 = 350
+        if size2 < 350:
+            size2 = 350
+        #заполняем таблицу заново ради автоматического расширения ширины
+        treeRuch["columns"]=("Name", "NameDB", "Type", "Lic", "Cena")
+        treeRuch.column("#0", width=50)
+        winRuch.minsize(width=(size2+550), height=200)
+        treeRuch.column("Name", width=size2, stretch=True)
+        treeRuch.column("NameDB", width=120, stretch=True)
+        treeRuch.column("Type", width=150, stretch=True)
+        treeRuch.column("Lic", width=120, stretch=True)
+        treeRuch.column("Cena", width=80, stretch=True)
+        treeRuch.heading("#0", text="№:") #убирать лишние определения колонок нельзя, иначе все криво
+        treeRuch.heading("Name", text="Название:")
+        treeRuch.heading("NameDB", text="В базе:")
+        treeRuch.heading("Type", text="Тип:")
+        treeRuch.heading("Lic", text="Лицензия:")
+        treeRuch.heading("Cena", text="~Цена:")
+        treeRuch.pack(side = BOTTOM)
 
 #str(datetime.now())
     def SaveRuch():
@@ -279,7 +335,6 @@ def RuchSearchProg():
 
     treeRuch.pack(side = BOTTOM, expand=False)
     frameRuch.pack(side = BOTTOM, expand=False)
-
     #заполняем таблицу
     treeRuch["columns"]=("Name", "NameDB", "Type", "Lic", "Cena")
     treeRuch.column("#0", width=50)
@@ -372,6 +427,7 @@ def MediaSearch():
         E1.insert(0, katalog)
     def PoiskMediaDlyaKnopki():
         """Функция для кнопки поиск"""
+        treeMed.delete(*treeMed.get_children()) #очистка содержимого предыдущего поиска
         spisok=[]
         slovar={}
         dir = message.get()
@@ -497,6 +553,8 @@ def MediaSearch():
     treeMed.pack(side = LEFT, expand=True)
 ### конец медиа поиска
 
+#АВТОПОИСК
+
 #Создание меню основного окна
 m=Menu(root)
 root.config(menu=m)
@@ -545,13 +603,15 @@ tree.heading("Name", text="Название:")
 tree.heading("Type", text="Тип:")
 tree.heading("Lic", text="Лицензия:")
 tree.heading("Cena", text="~Цена:")
-
+#Добавляю ОС и стоимость
+name_os, cena_os = DetectOS()
+tree.insert("" , 1, text='1', values=(name_os, 'Платное ПО', 'Shareware', cena_os))
 #Пробую работать с SQLite
 BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
 BaseLpro.row_factory = sqlite3.Row
 CurBLpro = BaseLpro.cursor()
 IntallPath = {}
-i = 1
+i = 2
 software_list = sorted(software_list, key=lambda x: x['name']) #Сортировка списка словарей в автопоиске
 n1 = [] #список для удаления дублей, в него добавляю, чтобы сравнить есть ли уже этот элемент
 for itemsoft in software_list:
@@ -661,6 +721,11 @@ def DoubleClic(event): #Функция для события двойного к
             size1 = 380
     if size1 < 380:
         size1 = 380
+    search_exemple = re.search( r'Windows', d[0], re.M|re.I)
+    if search_exemple:
+        treeMore.insert("" , '8', text='8', values=('Ключ Windows:', get_windows_product_key_from_reg()))
+    #else:
+    #    print("Нет совпадений!")
     treeMore.pack(side = LEFT, expand=True)
     winMore.minsize(width=(size1+180), height=200)
     treeMore.column("Parametr", width=size1, stretch=True)

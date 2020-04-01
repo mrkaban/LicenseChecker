@@ -72,3 +72,5 @@ def filter(NameProg):
 
 
     return edited_NameProg
+if __name__ == "__main__":
+    print('Запущен как основной файл, а не как модуль')
