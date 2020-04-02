@@ -96,19 +96,25 @@ def Spravka():
     winSpravka.mainloop()
 def UpdateProg():
     """проверка наличия новой версии программы"""
-    my_version = 0.3
+    #my_version = '0.3'
     try:
         f = urllib.request.urlopen("https://github.com/mrkaban/LicenseCheker/raw/master/version")
         h = str(f.read())
     except:
         messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    if my_version != h:
+    search_exemple = re.search(r'0.3', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #if my_version != h:
+    if not search_exemple:
         try:
-            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/raw/master/LicenseCheker.zip")
+            messagebox.showinfo("Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
+Скачайте подходящую для Вас версию. Если не получается найти файлы, нажмите на \'Assets\'.")
+            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/releases")
         except:
             messagebox.showerror("Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
             return
+    else:
+        messagebox.showinfo("Программа актуальна", "Используемая Вами версия программы актуальна.")
 def UpdateBase():
     """Обновление базы данных Lpro.db"""
     BaseUpdateBase = sqlite3.connect(r"data\Lpro.db", uri=True)
@@ -153,7 +159,7 @@ def ViewBD():
     #winBD.geometry("900x300")
     frameBD2 = Frame(winBD)
 
-    L2 = Label(frameBD2, text="Укажите название программы и нажмите кнопку 'Поиск'")
+    L2 = Label(frameBD2, text="Укажите название программы для поиска в базе данных и нажмите кнопку 'Поиск'")
     L2.pack(side=TOP)
     L1 = Label(frameBD2, text="Название:")
     L1.pack(side = LEFT, expand = True)
@@ -161,7 +167,7 @@ def ViewBD():
     E1 = Entry(frameBD2, width=50, textvariable=message)
     E1.pack(side = LEFT, expand = True)
 
-    def ViewBDDlyaKnopki(event):
+    def ViewBDDlyaKnopki(event=None):
         """Функция для кнопки поиск"""
         treeBD.delete(*treeBD.get_children())
         name_user_prog = message.get()
