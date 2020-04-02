@@ -33,6 +33,7 @@ setup(name='LicenseCheker',
                   ('data', ['data/LicenseCheker.png']),
                   ('data', ['data/Lpro.db']),
                   ('data', ['data/LicenseCheker.ico']),
+                  ('data', ['data/gpl-2.0.rtf']),
                   ],
       options=options,
             executables = [
@@ -51,4 +52,4 @@ setup(name='LicenseCheker',
 #python.exe setup.pyw bdist_msi
 #--ext-list-file=data/Lpro.db, LicenseCheker.png, LicenseCheker.ico  -icon=LicenseCheker.ico
 
-# cd /d D:\Public\LicenseCheker\0.2
+# cd /d D:\Public\LicenseCheker\0.3

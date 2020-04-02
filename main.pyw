@@ -33,6 +33,67 @@ def close_win():
 def WebStr():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/")
+def WebHelp():
+    """открытие веб-страницы в браузере по умолчанию"""
+    webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/issues")
+def Spravka():
+    """Справка о программе"""
+    winSpravka = Tk()
+    winSpravka.iconbitmap('data\\LicenseCheker.ico')
+    winSpravka.title("Справка о программе LicenseCheker")
+    winSpravka.geometry("400x180")
+    winSpravka.resizable(width=False, height=False)
+    tab_control = ttk.Notebook(winSpravka)
+    tab1 = Frame(tab_control)
+    tab2 = Frame(tab_control)
+    tab3 = Frame(tab_control)
+    tab4 = Frame(tab_control)
+    tab_control.add(tab1, text='Автопоиск')
+    tab_control.add(tab2, text='Ручной поиск')
+    tab_control.add(tab3, text='Медиа поиск')
+    tab_control.add(tab4, text='Поиск в базе')
+    #вкладка автопоиск
+    labTab1=Label(tab1, text="Автоматический поиск", font='Arial 14 bold')
+    labTab1.grid(column=0, row=0)
+    labTab2=Label(tab1, text="Автоматический поиск срабатывает при запуске программы.\
+                                \nПользователь при появлении окна видит его результаты.\
+                                \nВсе данные берутся из системного реестра Windows\
+                                \nНазвания фильтруются от версий, так как разработчики\
+                                \nназвания своих программ в реестре указывают с версиями.\
+                                \nЦены указываются примерные, могут не совпадать с реальными.\
+                                \nПри двойном клике по строке открываются подробности.\
+                                \nВ контекстном меню присутствует пункт копировать.", justify="left", pady=0, padx=1)
+    labTab2.grid(column=0, row=2)
+    #вкладка ручной поиск
+    labTab3=Label(tab2, text="Ручной поиск программ", font='Arial 14 bold')
+    labTab3.grid(column=0, row=0)
+    labTab4=Label(tab2, text="Ручной поиск программ в указанной директории ищет все\
+                                \nисполняемые файлы, собирает их в один список, а далее\
+                                \nсравнивает элементы списка с базой данных.\
+                                \nМожно указывать отдельную папку, или весь жесткий диск.\
+                                \nСтепень обнаружения зависит от наполнения имен файл в базе\
+                                \nили совпадением имени файла с названием программы.\
+                                \nПри поиске учитываются только exe файлы.", justify="left", pady=0, padx=1)
+    labTab4.grid(column=0, row=2)
+    #вкладка медиа поиск
+    labTab5=Label(tab3, text="Медиа поиск", font='Arial 14 bold')
+    labTab5.grid(column=0, row=0)
+    labTab6=Label(tab3, text="Медиа поиск позволяет найти в указанной папке все изображения,\
+                                \nаудио и видео наиболее популярных форматов (.tiff, .jpeg, .bmp, .jpe,\
+                                \n.jpg, .png, .gif, .psd, .mpeg, .flv, .mov, .m4a, .ac3, .aac, .h264,\
+                                \n.m4v, .mkv, .mp4, .3gp, .avi, .ogg, .vob, .wma, .mp3, .wav, .mpg, .wmv).\
+                                \nМожно указать минимальный размер обнаруживаемых файлов.\
+                                \nДля поиска можно указывать отдельные папки или весь диск.", justify="left", pady=0, padx=1)
+    labTab6.grid(column=0, row=2)
+    #вкладка поиск в базе
+    labTab7=Label(tab4, text="Поиск в базе данных", font='Arial 14 bold')
+    labTab7.grid(column=0, row=0)
+    labTab8=Label(tab4, text="Поиск в базе позволяет найти в ней программу по части названия.\
+                                \nНапример, \'Архиватор WinRaR 3.53\', в базе достаточно набрать \'Winrar\'\
+                                \nСама база данных хранится в папке с программой \\data\\Lpro.db.", justify="left", pady=0, padx=1)
+    labTab8.grid(column=0, row=2)
+    tab_control.pack(expand=1, fill='both')
+    winSpravka.mainloop()
 def UpdateProg():
     """проверка наличия новой версии программы"""
     my_version = 0.3
@@ -100,14 +161,14 @@ def ViewBD():
     E1 = Entry(frameBD2, width=50, textvariable=message)
     E1.pack(side = LEFT, expand = True)
 
-    def ViewBDDlyaKnopki():
+    def ViewBDDlyaKnopki(event):
         """Функция для кнопки поиск"""
         treeBD.delete(*treeBD.get_children())
         name_user_prog = message.get()
         BaseLproVDB = sqlite3.connect(r"data\Lpro.db", uri=True)
         BaseLproVDB.row_factory = sqlite3.Row #подключаем базу данных и курсор
         CurBLproVDB = BaseLproVDB.cursor()
-        s = 'SELECT * FROM program WHERE (name LIKE "' + name_user_prog + '%%")'
+        s = 'SELECT * FROM program WHERE (name LIKE "%%' + name_user_prog + '%%")'
         CurBLproVDB.execute(s)
         records = CurBLproVDB.fetchall()
         added = False
@@ -121,6 +182,7 @@ def ViewBD():
         CurBLproVDB.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproVDB.close()
 
+    E1.bind('<Return>', ViewBDDlyaKnopki)
     btnPoisk = Button(frameBD2, text="Поиск", command=ViewBDDlyaKnopki)
     btnPoisk.pack(side = LEFT, expand = True)
     frameBD2.pack(side = TOP, expand=False)
@@ -153,6 +215,25 @@ def ViewBD():
     treeBD.heading("Cena", text="~Цена:")
     winBD.resizable(width=False, height=False)
     treeBD.pack(side = BOTTOM)
+    #Создаем контекстное меню для ручного поиска
+    def show_menu_BD(evt):
+        pr_BD_menu.post(evt.x_root, evt.y_root)
+    def CopyBD():
+        try:
+            s1 = ([treeBD.item(x) for x in treeBD.selection()]) #Получаю выделенную строку
+            s1 = s1[0] #вытаскиваю словарь из списка
+        except IndexError:
+            return False
+        d1 = s1['values']
+        c = Tk()
+        c.withdraw()
+        c.clipboard_clear()
+        c.clipboard_append(d1[0] + ' ' + d1[1]+ ' ' + d1[2]+ ' ' + d1[3])
+        c.update()
+        c.destroy()
+    pr_BD_menu=Menu(frameBD, tearoff=False)
+    pr_BD_menu.add_command(label="Копировать", command=CopyBD)
+    treeBD.bind("<Button-3>", show_menu_BD)
 
 def about():
     """окно о программе"""
@@ -231,9 +312,9 @@ def RuchSearchProg():
                  slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                  added = True
                  #break
-             i += 1
+                 i += 1
              if added == False:
-                 i = i -1
+                  #i = i -1
                  #Если не найдено в поле file, тогда ищем в поле name
                  s = 'SELECT * FROM program WHERE (name LIKE "' + NamePF + '%%")'
                  CurBLproRuch.execute(s)
@@ -350,6 +431,25 @@ def RuchSearchProg():
     treeRuch.heading("Lic", text="Лицензия:")
     treeRuch.heading("Cena", text="~Цена:")
     treeRuch.pack(side = BOTTOM)
+    #Создаем контекстное меню для ручного поиска
+    def show_menu_Ruch(evt):
+        pr_Ruch_menu.post(evt.x_root, evt.y_root)
+    def CopyRuch():
+        try:
+            s1 = ([treeRuch.item(x) for x in treeRuch.selection()]) #Получаю выделенную строку
+            s1 = s1[0] #вытаскиваю словарь из списка
+        except IndexError:
+            return False
+        d1 = s1['values']
+        c = Tk()
+        c.withdraw()
+        c.clipboard_clear()
+        c.clipboard_append(d1[0] + ' ' + d1[1]+ ' ' + d1[2]+ ' ' + d1[3]+ ' ' + d1[4])
+        c.update()
+        c.destroy()
+    pr_Ruch_menu=Menu(frameRuch, tearoff=False)
+    pr_Ruch_menu.add_command(label="Копировать", command=CopyRuch)
+    treeRuch.bind("<Button-3>", show_menu_Ruch)
 
 
 #Сохранить отчет автопоиска
@@ -547,6 +647,27 @@ def MediaSearch():
         size1 = 380
     if size2 == None:
         size2 = 120
+
+    #Создаем контекстное меню для медиа поиска
+    def show_menu_media(evt):
+        pr_media_menu.post(evt.x_root, evt.y_root)
+    def Copymedia():
+        try:
+            s1 = ([treeMed.item(x) for x in treeMed.selection()]) #Получаю выделенную строку
+            s1 = s1[0] #вытаскиваю словарь из списка
+        except IndexError:
+            return False
+        d1 = s1['values']
+        c = Tk()
+        c.withdraw()
+        c.clipboard_clear()
+        c.clipboard_append(d1[0] + ' ' + d1[1]+ ' ' + d1[2])
+        c.update()
+        c.destroy()
+    pr_media_menu=Menu(frameMed, tearoff=False)
+    pr_media_menu.add_command(label="Копировать", command=Copymedia)
+    treeMed.bind("<Button-3>", show_menu_media)
+
     winMedia.minsize(width=(size1+ size2 + 180), height=200)
     treeMed.column("Name", width=size1, stretch=True)
     treeMed.column("Size", width=size2, stretch=True, anchor=CENTER)
@@ -570,7 +691,9 @@ pm.add_command(label="Поиск в базе", command=ViewBD)
 hm=Menu(m)
 m.add_cascade(label="?", menu=hm)
 hm.add_command(label="О программе", command=about)
+hm.add_command(label="Справка", command=Spravka)
 hm.add_command(label="Официальный сайт", command=WebStr)
+hm.add_command(label="Служба поддержки", command=WebHelp)
 hm.add_command(label="Обновить базу данных", command=UpdateBase)
 hm.add_command(label="Проверить наличие новой версии", command=UpdateProg)
 
@@ -603,6 +726,27 @@ tree.heading("Name", text="Название:")
 tree.heading("Type", text="Тип:")
 tree.heading("Lic", text="Лицензия:")
 tree.heading("Cena", text="~Цена:")
+
+#Создаем контекстное меню
+
+def show_menu_root(evt):
+    pr_root_menu.post(evt.x_root, evt.y_root)
+def CopyRoot():
+    try:
+        s1 = ([tree.item(x) for x in tree.selection()]) #Получаю выделенную строку
+        s1 = s1[0] #вытаскиваю словарь из списка
+    except IndexError:
+        return False
+    d1 = s1['values']
+    c = Tk()
+    c.withdraw()
+    c.clipboard_clear()
+    c.clipboard_append(d1[0] + ' ' + d1[1]+ ' ' + d1[2]+ ' ' + d1[3])
+    c.update()
+    c.destroy()
+pr_root_menu=Menu(frame, tearoff=False)
+pr_root_menu.add_command(label="Копировать", command=CopyRoot)
+
 #Добавляю ОС и стоимость
 name_os, cena_os = DetectOS()
 tree.insert("" , 1, text='1', values=(name_os, 'Платное ПО', 'Shareware', cena_os))
@@ -724,8 +868,26 @@ def DoubleClic(event): #Функция для события двойного к
     search_exemple = re.search( r'Windows', d[0], re.M|re.I)
     if search_exemple:
         treeMore.insert("" , '8', text='8', values=('Ключ Windows:', get_windows_product_key_from_reg()))
-    #else:
-    #    print("Нет совпадений!")
+
+    def show_menu(evt):
+        pr_menu.post(evt.x_root, evt.y_root)
+    def CopyDC():
+        try:
+            s1 = ([treeMore.item(x) for x in treeMore.selection()]) #Получаю выделенную строку
+            s1 = s1[0] #вытаскиваю словарь из списка
+        except IndexError:
+            return False
+        d1 = s1['values']
+        c = Tk()
+        c.withdraw()
+        c.clipboard_clear()
+        c.clipboard_append(d1[1])
+        c.update()
+        c.destroy()
+    pr_menu=Menu(winMore, tearoff=False)
+    pr_menu.add_command(label="Копировать", command=CopyDC)
+    treeMore.bind("<Button-3>", show_menu)
+
     treeMore.pack(side = LEFT, expand=True)
     winMore.minsize(width=(size1+180), height=200)
     treeMore.column("Parametr", width=size1, stretch=True)
@@ -734,6 +896,7 @@ def DoubleClic(event): #Функция для события двойного к
     BaseDC.close()
 
 root.bind('<Double-Button-1>', DoubleClic)
+tree.bind("<Button-3>", show_menu_root)
 
 CurBLpro.close()
 BaseLpro.close()
