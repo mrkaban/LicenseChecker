@@ -26,8 +26,8 @@ options = {
 
 
 setup(name='LicenseCheker',
-      version='0.3',
-      description='LicenseCheker - Проверка лицензий установленных программ',
+      version='1.0',
+      description='LicenseCheker - Проверка легальности установленных программ',
       author = 'mrkaban (КонтинентСвободы.рф)',
       data_files=[
                   ('data', ['data/LicenseCheker.png']),
@@ -52,4 +52,4 @@ setup(name='LicenseCheker',
 #python.exe setup.pyw bdist_msi
 #--ext-list-file=data/Lpro.db, LicenseCheker.png, LicenseCheker.ico  -icon=LicenseCheker.ico
 
-# cd /d D:\Public\LicenseCheker\0.3
+# cd /d D:\Public\LicenseCheker\1.0
