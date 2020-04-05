@@ -17,6 +17,7 @@ import socket #Для получения имени компьютера
 from SearchKey import * #Поиск слов купить и т.п. в папке с программой
 from PIL import ImageTk, Image
 from CheckOS import *
+from poisklicsogl import *
 
 #Получаем данные из реестра в список(словари)
 software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
@@ -36,6 +37,41 @@ def WebStr():
 def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/issues")
+def PoiskZameni():
+    """Поиск замены на сайте КонтинентСвободы.рф"""
+    winPZ= Toplevel(root)
+    winPZ.iconbitmap('data\\LicenseCheker.ico')
+    winPZ.resizable(width=False, height=False)
+    winPZ.title("Поиск замены на сайте КонтинентСвободы.рф")
+    winPZ.minsize(width=200, height=210)
+    framePZ = Frame(winPZ)
+    L2 = Label(framePZ, text="Укажите ключевые слова для поиска (например, \"Графический редактор\") и нажмите \
+кнопку 'Поиск'", pady=10, padx=0)
+    L2.pack(side=TOP)
+    L1 = Label(framePZ, text="Ключевое слово:")
+    L1.pack(side = LEFT, expand = True)
+    message = StringVar()
+    E1 = Entry(framePZ, width=50, textvariable=message)
+    E1.pack(side = LEFT, expand = True)
+    def PoiskZameniDlyaKnopki(event=None):
+        """Функция для кнопки поиск"""
+        s = message.get()
+        if s.find(" ", 0, len(s)) >= 1: #Только отдельно, удаление кавычек
+             s = s.replace(" ", '+')
+        url_kluch = 'https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/component/search/?searchword='+s
+        webbrowser.open_new_tab(url_kluch)
+    E1.bind('<Return>', PoiskZameniDlyaKnopki)
+    btnPoisk = Button(framePZ, text="Поиск", command=PoiskZameniDlyaKnopki)
+    btnPoisk.pack(side = RIGHT, expand = True)
+    framePZ.pack(side = TOP, expand=True)
+    framePZ2 = Frame(winPZ)
+    L3 = Label(framePZ2, text="Пишите кратко, иначе ничего не будет найдено. Если обнаружено мало замен, посмотрите в них\n\
+под блоком с кнопкой скачать есть ссылки на похожие материалы. Также можно открыть категорию,\n\
+где был найден аналог и посмотреть вручную.")
+    L3.pack(side=BOTTOM)
+    framePZ2.pack(side = TOP, expand=True)
+    winPZ.transient(root) #не даём переключить фокус на главное окно
+    winPZ.grab_set()
 def Spravka():
     """Справка о программе"""
     winSpravka = Tk()
@@ -93,6 +129,8 @@ def Spravka():
                                 \nСама база данных хранится в папке с программой \\data\\Lpro.db.", justify="left", pady=0, padx=1)
     labTab8.grid(column=0, row=2)
     tab_control.pack(expand=1, fill='both')
+    #winSpravka.transient(root) #не даём переключить фокус на главное окно
+    #winSpravka.grab_set() #Тут работает с ошибкой!!!!!!!!!!!!!!
     winSpravka.mainloop()
 def UpdateProg():
     """проверка наличия новой версии программы"""
@@ -103,7 +141,7 @@ def UpdateProg():
     except:
         messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'0.3', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    search_exemple = re.search(r'0.4', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #if my_version != h:
     if not search_exemple:
         try:
@@ -140,13 +178,40 @@ def UpdateBase():
                 f = open("data\\Lpro.db", "wb")
                 f.write(bd1)
                 f.close()
-                txt1 = "База данных успешно обновлена до версии " + h + "!"
+                #синхронизируем пользовательскую базу данных
+                sinh = False
+                try:
+                    BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
+                    BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
+                    CurUserSinh = BaseUserSinh.cursor()
+                    s = 'SELECT * FROM UserProgram'
+                    CurUserSinh.execute(s)
+                    records = CurUserSinh.fetchall()
+                    zapis_v_lpro = []
+                    r = 20000
+                    for row in records:
+                        f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
+                        zapis_v_lpro.append(f)
+                        r = r + 1
+                    CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
+                    BaseUpdateBase.commit()
+                    sinh = True
+                except:
+                    messagebox.showerror("Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
+базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+                    sinh = False
+                if sinh == False:
+                    txt1 = "База данных успешно обновлена до версии " + h + "!"
+                else:
+                    txt1 = "База данных успешно обновлена до версии " + h + "!" + "Пользовательская база данных успешно\
+синхронизиррована с основной базой."
                 messagebox.showinfo("База обновлена", txt1)
             except:
                 messagebox.showerror("Не удалось загрузить БД", "Не удалось загрузить базу данных.")
                 break
         else:
             messagebox.showinfo("База данных актуальна", "Обновление базы данных не требуется.")
+
     CurUpdateBase.close() #Закрываю соединение с базой и с курсором для базы
     BaseUpdateBase.close()
 def ViewBD():
@@ -177,16 +242,43 @@ def ViewBD():
         s = 'SELECT * FROM program WHERE (name LIKE "%%' + name_user_prog + '%%")'
         CurBLproVDB.execute(s)
         records = CurBLproVDB.fetchall()
+        size_list=[]
+        size2 = None
         added = False
         i = 1
         for row in records:
+            size2= 0
             treeBD.insert("" , i-1, text=i, values=(row[1], row[2], row[3], row[4]))
+            size_list.append(((len(row[1]))*6))
             added = True
             i += 1
             if added == False:
                 i = i -1
         CurBLproVDB.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproVDB.close()
+
+        for itemsize in size_list:
+            if size2 <= int(itemsize):
+                size2 = int(itemsize)
+        if size2 == None:
+            size2 = 300
+        if size2 < 300:
+            size2 = 300
+        #winBD.minsize(width=size2, height=200)
+        #заполняем таблицу
+        treeBD["columns"]=("Name","Type", "Lic", "Cena")
+        treeBD.column("#0", width=50)
+        treeBD.column("Name", width=size2, stretch=True)
+        treeBD.column("Type", width=150, stretch=True)
+        treeBD.column("Lic", width=120, stretch=True)
+        treeBD.column("Cena", width=80, stretch=True)
+        treeBD.heading("#0", text="№:")
+        treeBD.heading("Name", text="Название:")
+        treeBD.heading("Type", text="Тип:")
+        treeBD.heading("Lic", text="Лицензия:")
+        treeBD.heading("Cena", text="~Цена:")
+        #winBD.resizable(width=False, height=False)
+        #treeBD.pack(side = BOTTOM)
 
     E1.bind('<Return>', ViewBDDlyaKnopki)
     btnPoisk = Button(frameBD2, text="Поиск", command=ViewBDDlyaKnopki)
@@ -240,6 +332,8 @@ def ViewBD():
     pr_BD_menu=Menu(frameBD, tearoff=False)
     pr_BD_menu.add_command(label="Копировать", command=CopyBD)
     treeBD.bind("<Button-3>", show_menu_BD)
+    winBD.transient(root) #не даём переключить фокус на главное окно
+    winBD.grab_set()
 
 def about():
     """окно о программе"""
@@ -253,7 +347,7 @@ def about():
     initil = Label(winAbout, image=render)
     initil.image = render
     initil.pack(side = "left")
-    lab=Label(winAbout, text="LicenseCheker 1.0", justify="left", font='Arial 14 bold')
+    lab=Label(winAbout, text="LicenseCheker 0.4", justify="left", font='Arial 14 bold')
     lab.pack(side = "top")
     lab4=Label(winAbout, text="\nЦель: Помочь разобраться с лицензиями \nна программное обеспечение", justify="left")
     lab4.pack()
@@ -262,6 +356,8 @@ def about():
     lab3=Label(winAbout, text="КонтинентСвободы.рф", justify="left", fg="blue")
     lab3.pack()
     lab3.bind('<Button-1>', WebStr)
+    winAbout.transient(root) #не даём переключить фокус на главное окно
+    winAbout.grab_set()
 def RuchSearchProg():
     """Ручной поиск программ"""
     winRuch= Toplevel(root)
@@ -271,6 +367,27 @@ def RuchSearchProg():
     #winRuch.minsize(width=400, height=200)
     winRuch.geometry("900x300")
     frameRuch2 = Frame(winRuch)
+
+    kol_kat = None
+    def UkazatOdinKatalog():
+        global kol_kat
+        btnRuchMen.config(text="1 каталог")
+        kol_kat = 1
+    def UkazatDvaKataloga():
+        global kol_kat
+        btnRuchMen.config(text="2 каталога")
+        kol_kat = 2
+    def UkazatTriKataloga():
+        global kol_kat
+        btnRuchMen.config(text="3 каталога")
+        kol_kat = 3
+    menu_ruch_but = tkinter.Menu(frameRuch2, tearoff=False)
+    menu_ruch_but.add_command(label='1 каталог', command=UkazatOdinKatalog)
+    menu_ruch_but.add_command(label='2 каталога', command=UkazatDvaKataloga)
+    menu_ruch_but.add_command(label='3 каталога', command=UkazatTriKataloga)
+    btnRuchMen = tkinter.ttk.Menubutton(frameRuch2, text="1 каталог", menu=menu_ruch_but)
+    btnRuchMen.pack(side = LEFT)
+
     L2 = Label(frameRuch2, text="Укажите каталог для поиска следов программ и нажмите кнопку 'Поиск'")
     L2.pack(side=TOP)
     L1 = Label(frameRuch2, text="Каталог")
@@ -281,25 +398,83 @@ def RuchSearchProg():
     slovarSave= {}
     size_list=[]
     size2 = None
+    kol_kat == None
+    spisok_katalogov = []
     def OpenKatalog():
         """Открыть каталог"""
-        E1.delete(first=0,last=50)
-        katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите директорию для поиска')
-        E1.insert(0, katalog)
+        global kol_kat
+        if kol_kat == None or kol_kat == 1:
+            E1.delete(first=0,last=50)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите директорию для поиска')
+            E1.insert(0, katalog)
+        if kol_kat == 2:
+            E1.delete(first=0,last=50)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите 1 директорию для поиска')
+            E1.insert(0, katalog)
+            spisok_katalogov.append(katalog)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите 2 директорию для поиска')
+            spisok_katalogov.append(katalog)
+        if kol_kat == 3:
+            E1.delete(first=0,last=50)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите 1 директорию для поиска')
+            E1.insert(0, katalog)
+            spisok_katalogov.append(katalog)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите 2 директорию для поиска')
+            spisok_katalogov.append(katalog)
+            katalog = tkinter.filedialog.askdirectory(parent=winRuch, title='Укажите 3 директорию для поиска')
+            spisok_katalogov.append(katalog)
     def PoiskRuchnoiDlyaKnopki():
         """Функция для кнопки поиск"""
         treeRuch.delete(*treeRuch.get_children()) #очистка содержимого предыдущего поиска
         spisok=[]
         slovar={}
         size2= 0
-        dir = message.get()
-        for root, dirs, files in os.walk(dir):
-             # пройти по директории рекурсивно
-             for name in files:
-                 if name[-4:]=='.exe':
-                     fullname = os.path.join(root, name) # получаем полное имя файла
-                     slovar[name]=fullname
-                     spisok.append(name)
+        global kol_kat
+        if kol_kat == None or kol_kat == 1:
+            dir = message.get()
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                 for name in files:
+                     if name[-4:]=='.exe':
+                         fullname = os.path.join(root, name) # получаем полное имя файла
+                         slovar[name]=fullname
+                         spisok.append(name)
+        if kol_kat == 2:
+            dir = spisok_katalogov[0]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = spisok_katalogov[1]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        slovar[name]=fullname
+                        spisok.append(name)
+        if kol_kat == 3:
+            dir = spisok_katalogov[0]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = spisok_katalogov[1]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = spisok_katalogov[2]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        slovar[name]=fullname
+                        spisok.append(name)
         BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
         BaseLproRuch.row_factory = sqlite3.Row #подключаем базу данных и курсор
         CurBLproRuch = BaseLproRuch.cursor()
@@ -357,7 +532,7 @@ def RuchSearchProg():
         treeRuch.heading("Type", text="Тип:")
         treeRuch.heading("Lic", text="Лицензия:")
         treeRuch.heading("Cena", text="~Цена:")
-        treeRuch.pack(side = BOTTOM)
+        treeRuch.pack(side = BOTTOM, expand = True)
 
 #str(datetime.now())
     def SaveRuch():
@@ -407,7 +582,7 @@ def RuchSearchProg():
     btnPoisk.pack(side = LEFT, expand = True)
     btnSave = Button(frameRuch2, text="Сохранить", command=SaveRuch)
     btnSave.pack(side = LEFT, expand = True)
-    frameRuch2.pack(side = TOP, expand=False)
+    frameRuch2.pack(side = TOP, expand=True)
     #Рисую таблицу для ручного поиска
     treeRuch = ttk.Treeview(winRuch)
     frameRuch = Frame(winRuch)
@@ -420,8 +595,8 @@ def RuchSearchProg():
 
     treeRuch.configure(yscrollcommand=scrollbar_vertical.set)
 
-    treeRuch.pack(side = BOTTOM, expand=False)
-    frameRuch.pack(side = BOTTOM, expand=False)
+    treeRuch.pack(side = BOTTOM, expand=True)
+    frameRuch.pack(side = BOTTOM, expand=True)
     #заполняем таблицу
     treeRuch["columns"]=("Name", "NameDB", "Type", "Lic", "Cena")
     treeRuch.column("#0", width=50)
@@ -456,6 +631,8 @@ def RuchSearchProg():
     pr_Ruch_menu=Menu(frameRuch, tearoff=False)
     pr_Ruch_menu.add_command(label="Копировать", command=CopyRuch)
     treeRuch.bind("<Button-3>", show_menu_Ruch)
+    winRuch.transient(root) #не даём переключить фокус на главное окно
+    winRuch.grab_set()
 
 
 #Сохранить отчет автопоиска
@@ -506,8 +683,8 @@ def MediaSearch():
     winMedia.iconbitmap('data\\LicenseCheker.ico')
     winMedia.resizable(width=False, height=False)
     winMedia.title("Поиск медиа файлов (аудио, видео, изображения) в указанной директории")
-    #winMedia.minsize(width=400, height=200)
-    #winMedia.geometry("900x300")
+    #winMedia.minsize(width=480, height=200)
+    #winMedia.geometry("480x200")
     frameMed2 = Frame(winMedia)
     L2 = Label(frameMed2, text="Укажите каталог для поиска медиа файлов и нажмите кнопку 'Поиск'")
     L2.pack(side=TOP)
@@ -523,7 +700,23 @@ def MediaSearch():
     message = StringVar()
     E1 = Entry(frameMed2, width=50, textvariable=message)
     E1.pack(side = LEFT, expand = True)
-    size1 = None
+
+
+    #Рисую таблицу для ручного поиска
+    treeMed = ttk.Treeview(winMedia)
+    frameMed = Frame(winMedia)
+
+    treeMed = ttk.Treeview(frameMed, selectmode='browse')
+
+    scrollbar_vertical = ttk.Scrollbar(frameMed, orient='vertical', command = treeMed.yview)
+
+    scrollbar_vertical.pack(side='right', fill=Y)
+
+    treeMed.configure(yscrollcommand=scrollbar_vertical.set)
+
+    treeMed.pack(side = BOTTOM, expand=True)
+    frameMed.pack(side = BOTTOM, expand=True)
+    size_list=[]
     size2 = None
     slovarMediaSave= {}
     def OpenMedKatalog():
@@ -554,6 +747,7 @@ def MediaSearch():
                          except:
                              print('Исключение при сравнении размера файлов')
                          spisok.append(name)
+                         size_list.append(((len(fullname))*6))
         i = 1
         for itemsoft in spisok:
             NameP=itemsoft
@@ -571,14 +765,34 @@ def MediaSearch():
             for format in SpVideo:
                 if ext==format:
                     TipFile = 'Видео'
-            size1 = (len(slovar[itemsoft]))*6
             razmerFile = os.path.getsize(slovar[itemsoft])
             razmerFile = round(((razmerFile/1024)/1024), 2)
             razmerFileStr = str(razmerFile) + ' МБ'
-            size2 = (len(razmerFileStr))*7
             treeMed.insert("" , i-1, text=i, values=(slovar[itemsoft], TipFile, razmerFileStr))
             slovarMediaSave[slovar[itemsoft]] = {'File':slovar[itemsoft], 'Tip':TipFile, 'Size':razmerFileStr}
             i += 1
+            size2= 0
+            for itemsize in size_list:
+                if size2 <= int(itemsize):
+                    size2 = int(itemsize)
+            if size2 == None:
+                size2 = 350
+            if size2 < 350:
+                size2 = 350
+            #treeMed["columns"]=("Name", "Type", "Size")
+            #winMedia.minsize(width=size2+180, height=200)
+            # frameMed=Frame(winMedia,width=size2+180)
+            # treeMed.column("#0", width=50)
+            # treeMed.column("Name", width=size2, stretch=True)
+            # treeMed.column("Type", width=150, stretch=True)
+            # treeMed.column("Size", width=120, stretch=True)
+            # treeMed.heading("#0", text="№:")
+            # treeMed.heading("Name", text="Имя файла:")
+            # treeMed.heading("Type", text="Тип:")
+            # treeMed.heading("Size", text="Размер:")
+            # treeMed.pack(side = LEFT, expand=True)
+            # frameMed2.pack(side = TOP, expand=True)
+            # frameMed.pack(side = BOTTOM, expand=True)
     def SaveMedia():
         """Сохранить отчет в HTML"""
         SbHTML = """
@@ -616,44 +830,23 @@ def MediaSearch():
             messagebox.showinfo("Файл сохранен", "Файл успешно сохранен: " + file_name)
         except:
             messagebox.showinfo("Не удалось сохранить", "Не удалось сохранить файл: " + file_name)
-
     btnObzor = Button(frameMed2, text="Обзор", command=OpenMedKatalog)
     btnObzor.pack(side = LEFT, expand = True)
     btnPoisk = Button(frameMed2, text="Поиск", command=PoiskMediaDlyaKnopki)
     btnPoisk.pack(side = LEFT, expand = True)
     btnSave = Button(frameMed2, text="Сохранить", command=SaveMedia)
     btnSave.pack(side = LEFT, expand = True)
-    frameMed2.pack(side = TOP, expand=False)
-    #Рисую таблицу для ручного поиска
-    treeMed = ttk.Treeview(winMedia)
-    frameMed = Frame(winMedia)
-
-    treeMed = ttk.Treeview(frameMed, selectmode='browse')
-
-    scrollbar_vertical = ttk.Scrollbar(frameMed, orient='vertical', command = treeMed.yview)
-
-    scrollbar_vertical.pack(side='right', fill=Y)
-
-    treeMed.configure(yscrollcommand=scrollbar_vertical.set)
-
-    treeMed.pack(side = BOTTOM, expand=False)
-    frameMed.pack(side = BOTTOM, expand=False)
-
+    frameMed2.pack(side = TOP, expand=True)
     #заполняем таблицу
     treeMed["columns"]=("Name", "Type", "Size")
     treeMed.column("#0", width=50)
-    treeMed.column("Name", width=350, stretch=True)
+    treeMed.column("Name", width=500, stretch=True)
     treeMed.column("Type", width=150, stretch=True, anchor=CENTER)
     treeMed.column("Size", width=120, stretch=True, anchor=CENTER)
     treeMed.heading("#0", text="№:")
     treeMed.heading("Name", text="Имя файла:")
     treeMed.heading("Type", text="Тип:")
     treeMed.heading("Size", text="Размер:")
-    if size1 == None:
-        size1 = 380
-    if size2 == None:
-        size2 = 120
-
     #Создаем контекстное меню для медиа поиска
     def show_menu_media(evt):
         pr_media_menu.post(evt.x_root, evt.y_root)
@@ -674,10 +867,9 @@ def MediaSearch():
     pr_media_menu.add_command(label="Копировать", command=Copymedia)
     treeMed.bind("<Button-3>", show_menu_media)
 
-    winMedia.minsize(width=(size1+ size2 + 180), height=200)
-    treeMed.column("Name", width=size1, stretch=True)
-    treeMed.column("Size", width=size2, stretch=True, anchor=CENTER)
     treeMed.pack(side = LEFT, expand=True)
+    winMedia.transient(root) #не даём переключить фокус на главное окно
+    winMedia.grab_set()
 ### конец медиа поиска
 
 #АВТОПОИСК
@@ -694,6 +886,7 @@ m.add_cascade(label="Поиск", menu=pm)
 pm.add_command(label="Ручной поиск программ", command=RuchSearchProg)
 pm.add_command(label="Медиа поиск", command=MediaSearch)
 pm.add_command(label="Поиск в базе", command=ViewBD)
+pm.add_command(label="Поиск замены на КонтинентСвободы.рф", command=PoiskZameni)
 hm=Menu(m)
 m.add_cascade(label="?", menu=hm)
 hm.add_command(label="О программе", command=about)
@@ -750,8 +943,12 @@ def CopyRoot():
     c.clipboard_append(d1[0] + ' ' + d1[1]+ ' ' + d1[2]+ ' ' + d1[3])
     c.update()
     c.destroy()
+def Podrobnee():
+    tree.event_generate("<<DblClick>>")
+    DoubleClic(event=None)
 pr_root_menu=Menu(frame, tearoff=False)
 pr_root_menu.add_command(label="Копировать", command=CopyRoot)
+pr_root_menu.add_command(label="Подробнее", command=Podrobnee)
 
 #Добавляю ОС и стоимость
 name_os, cena_os = DetectOS()
@@ -788,6 +985,7 @@ def DoubleClic(event): #Функция для события двойного к
     winMore= Toplevel(root)
     winMore.iconbitmap('data\\LicenseCheker.ico')
     winMore.resizable(width=False, height=False)
+    i1 = 1
     try:
         s = ([tree.item(x) for x in tree.selection()]) #Получаю выделенную строку
         s = s[0] #вытаскиваю словарь из списка
@@ -811,13 +1009,13 @@ def DoubleClic(event): #Функция для события двойного к
         spisokExe.append(g)
     TitleWinMore = d[0] + " - Подробности"
     winMore.title(TitleWinMore)
-    winMore.minsize(width=600, height=200)
+    winMore.minsize(width=600, height=250)
     #winMore.geometry("900x300")
     frameMore = Frame(winMore)
     frameMore.pack(side = TOP, expand=False)
     treeMore = ttk.Treeview(winMore)
     frameMore = Frame(winMore)
-    treeMore = ttk.Treeview(frameMore, selectmode='browse', show='headings')
+    treeMore = ttk.Treeview(frameMore, selectmode='browse', show='headings', height=12)
     scrollbar_vertical_More = ttk.Scrollbar(frameMore, orient='vertical', command = treeMore.yview)
     scrollbar_vertical_More.pack(side='right', fill=Y)
     treeMore.configure(yscrollcommand=scrollbar_vertical_More.set)
@@ -830,16 +1028,22 @@ def DoubleClic(event): #Функция для события двойного к
     treeMore.heading("#0", text="№:")
     treeMore.heading("Punkt", text="Пункт:")
     treeMore.heading("Parametr", text="Параметр:")
-    treeMore.insert("" , '1', text='1', values=('Название:', d[0]))
-    treeMore.insert("" , '2', text='2', values=('Тип ПО:', d[1]))
-    treeMore.insert("" , '3', text='3', values=('Лицензия:', d[2]))
-    treeMore.insert("" , '4', text='4', values=('Стоимость:', d[3]))
+    treeMore.insert("" , i1, text=i1, values=('Название:', d[0]))
+    i1 += 1
+    treeMore.insert("" , i1, text=i1, values=('Тип ПО:', d[1]))
+    i1 += 1
+    treeMore.insert("" , i1, text=i1, values=('Лицензия:', d[2]))
+    i1 += 1
+    treeMore.insert("" , i1, text=i1, values=('Стоимость:', d[3]))
+    i1 += 1
     size1 = None
     try:
-        treeMore.insert("" , '5', text='5', values=('Путь:', IntallPath[d[0]]))
+        treeMore.insert("" , i1, text=i1, values=('Путь:', IntallPath[d[0]]))
+        i1 += 1
         size1 = (len(IntallPath[d[0]]))*7
     except KeyError:
-        treeMore.insert("" , '5', text='5', values=('Путь:', 'Неизвестно'))
+        treeMore.insert("" , i1, text=i1, values=('Путь:', 'Неизвестно'))
+        i1 += 1
     try:
         dir = IntallPath[d[0]] + '\\' #IndexError:
         l1 = 0
@@ -848,33 +1052,71 @@ def DoubleClic(event): #Функция для события двойного к
             for name in files:
                 if name==spisokExe[0]:
                     fullname = os.path.join(root1, name) # получаем полное имя файла
-                    treeMore.insert("" , '6', text='6', values=('Подтверждение:', fullname))
+                    treeMore.insert("" , i1, text=i1, values=('Подтверждение:', fullname))
+                    i1 += 1
                     if size1 == None or size1<=len(fullname):
                         size1 = (len(fullname))*6
     except KeyError:
-        treeMore.insert("" , '6', text='6', values=('Подтверждение:', 'Не найдено'))
+        treeMore.insert("" , i1, text=i1, values=('Подтверждение:', 'Не найдено'))
+        i1 += 1
     except IndexError:
-        treeMore.insert("" , '6', text='6', values=('Подтверждение:', 'Не найдено'))
+        treeMore.insert("" , i1, text=i1, values=('Подтверждение:', 'Не найдено'))
+        i1 += 1
     try:
         if (len(IntallPath[d[0]]))>2:
             h=StartSeachKey(IntallPath[d[0]])
             h1 = h[0]
-            treeMore.insert("" , '7', text='7', values=('Поиск слов "Купить":', h1['path']))
+            treeMore.insert("" , i1, text=i1, values=('Поиск слов "Купить":', h1['path']))
+            i1 += 1
             size1 = (len(h1['path']))*6
         else:
-            treeMore.insert("" , '7', text='7', values=('Поиск слов "Купить":', 'Не найдены'))
+            treeMore.insert("" , i1, text=i1, values=('Поиск слов "Купить":', 'Не найдены'))
+            i1 += 1
             if size1 == None:
                 size1 = 380
     except:
-        treeMore.insert("" , '7', text='7', values=('Поиск слов "Купить":', 'Не найдены'))
+        treeMore.insert("" , i1, text=i1, values=('Поиск слов "Купить":', 'Не найдены'))
+        i1 += 1
         if size1 == None:
             size1 = 380
     if size1 < 380:
         size1 = 380
+    #i1 = 8
     search_exemple = re.search( r'Windows', d[0], re.M|re.I)
     if search_exemple:
-        treeMore.insert("" , '8', text='8', values=('Ключ Windows:', get_windows_product_key_from_reg()))
-
+        treeMore.insert("" , i1, text=i1, values=('Ключ Windows:', get_windows_product_key_from_reg()))
+        i1 += 1
+        i2 = 0
+        sled_spisok = sled_activation()
+        for sled in sled_spisok:
+            #i1 = i1 + 1
+            if i1 <= i2:
+                treeMore.insert("" , i1, text=i1, values=('-', sled))
+                i1 += 1
+                i2 += 1
+            else:
+                treeMore.insert("" , i1, text=i1, values=('Следы активации:', sled))
+                i1 += 1
+                i2 = i1
+    try:
+        if (len(IntallPath[d[0]])) > 0:
+            spisok_lic_sogl = poisk_lic_sogl(IntallPath[d[0]])
+            i2 = 0
+            for lic_sogl in spisok_lic_sogl:
+                if i1 <= i2:
+                    treeMore.insert("" , i1, text=i1, values=('-', lic_sogl))
+                    i1 += 1
+                    i2 += 1
+                else:
+                    treeMore.insert("" , i1, text=i1, values=('Лицензионное соглашение:', lic_sogl))
+                    i1 += 1
+                    i2 = i1
+        else:
+            treeMore.insert("" , i1, text=i1, values=('Лицензионное соглашение:', 'Не найдено'))
+            i1 += 1
+    except KeyError:
+        treeMore.insert("" , i1, text=i1, values=('Лицензионное соглашение:', 'Корневой каталог приложения не указан'))
+        i1 += 1
     def show_menu(evt):
         pr_menu.post(evt.x_root, evt.y_root)
     def CopyDC():
@@ -893,13 +1135,13 @@ def DoubleClic(event): #Функция для события двойного к
     pr_menu=Menu(winMore, tearoff=False)
     pr_menu.add_command(label="Копировать", command=CopyDC)
     treeMore.bind("<Button-3>", show_menu)
-
+    winMore.minsize(width=(size1+180), height=250)
     treeMore.pack(side = LEFT, expand=True)
-    winMore.minsize(width=(size1+180), height=200)
     treeMore.column("Parametr", width=size1, stretch=True)
-
     CurDC.close()
     BaseDC.close()
+    winMore.transient(root) #не даём переключить фокус на главное окно
+    winMore.grab_set()
 
 root.bind('<Double-Button-1>', DoubleClic)
 tree.bind("<Button-3>", show_menu_root)

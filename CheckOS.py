@@ -1,6 +1,8 @@
 import platform
 import winreg #Для проверки ключа ОС
 import wmi #Для проверки ключа ОС
+import os#для поиска следов активации
+import re
 
 def DetectOS():
     """Функция обнаружения операционной системы"""
@@ -135,9 +137,23 @@ def get_windows_product_key_from_wmi():
             return None
     except AttributeError:
         return None
+def sled_activation():
+    dir = 'C:\\Windows\\'
+    spisok=[]
+    for root, dirs, files in os.walk(dir):
+        for subdir in dirs:
+            pattern=r'Активатор|Activator|активатор|kms|AAct_Tools|ConsoleAct'
+            search_exemple = re.search(pattern, subdir, re.M|re.I)
+            if search_exemple:
+                s1 = root+'\\'+subdir+'\\'
+                if s1.find("\\\\", 0, len(s1)) >= 1: #Только отдельно, удаление кавычек
+                     s1 = s1.replace("\\\\", '\\')
+                spisok.append(s1)
+    return spisok
 #Конец проверки ключа ОС
 if __name__ == "__main__":
     a, b = DetectOS()
     print('Значение а: ', a, 'Значение b: ', b)
     print('Key from WMI: %s' % get_windows_product_key_from_wmi())
     print('Key from REG: %s' % get_windows_product_key_from_reg())
+    print(sled_activation())
