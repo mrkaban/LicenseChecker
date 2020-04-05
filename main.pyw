@@ -23,7 +23,7 @@ from poisklicsogl import *
 software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
 
 root = Tk()
-root.title("LicenseCheker - Проверка лицензий установленных программ")
+root.title("LicenseCheker - Проверка легальности установленных программ")
 root.iconbitmap('data\\LicenseCheker.ico')
 katalog=''
 
@@ -141,7 +141,7 @@ def UpdateProg():
     except:
         messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'0.4', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    search_exemple = re.search(r'1.0', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #if my_version != h:
     if not search_exemple:
         try:
@@ -347,7 +347,7 @@ def about():
     initil = Label(winAbout, image=render)
     initil.image = render
     initil.pack(side = "left")
-    lab=Label(winAbout, text="LicenseCheker 0.4", justify="left", font='Arial 14 bold')
+    lab=Label(winAbout, text="LicenseCheker 1.0", justify="left", font='Arial 14 bold')
     lab.pack(side = "top")
     lab4=Label(winAbout, text="\nЦель: Помочь разобраться с лицензиями \nна программное обеспечение", justify="left")
     lab4.pack()
