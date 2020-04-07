@@ -12,7 +12,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 if 'bdist_msi' in sys.argv:
-    sys.argv += ['--initial-target-dir', 'C:\\LicenseCheker']
+    sys.argv += ['--initial-target-dir', 'C:\\LicenseChecker']
 
 options = {
     'build_msi': {
@@ -25,14 +25,14 @@ options = {
 }
 
 
-setup(name='LicenseCheker',
+setup(name='LicenseChecker',
       version='1.0',
-      description='LicenseCheker - Проверка легальности установленных программ',
+      description='LicenseChecker - Проверка легальности установленных программ',
       author = 'mrkaban (КонтинентСвободы.рф)',
       data_files=[
-                  ('data', ['data/LicenseCheker.png']),
+                  ('data', ['data/LicenseChecker.png']),
                   ('data', ['data/Lpro.db']),
-                  ('data', ['data/LicenseCheker.ico']),
+                  ('data', ['data/LicenseChecker.ico']),
                   ('data', ['data/gpl-2.0.rtf']),
                   ],
       options=options,
@@ -41,8 +41,8 @@ setup(name='LicenseCheker',
             script = "main.pyw",
             copyright ='mrkaban (КонтинентСвободы.рф)',
             base=base,
-            icon="data/LicenseCheker.ico",
-            shortcutName="LicenseCheker",
+            icon="data/LicenseChecker.ico",
+            shortcutName="LicenseChecker",
             shortcutDir='ProgramMenuFolder',
             )
         ]
@@ -50,6 +50,6 @@ setup(name='LicenseCheker',
 
 # команда для CMD
 #python.exe setup.pyw bdist_msi
-#--ext-list-file=data/Lpro.db, LicenseCheker.png, LicenseCheker.ico  -icon=LicenseCheker.ico
+#--ext-list-file=data/Lpro.db, LicenseChecker.png, LicenseChecker.ico  -icon=LicenseChecker.ico
 
-# cd /d D:\Public\LicenseCheker\1.0
+# cd /d D:\Public\LicenseChecker\1.0

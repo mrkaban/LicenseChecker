@@ -23,8 +23,8 @@ from poisklicsogl import *
 software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
 
 root = Tk()
-root.title("LicenseCheker - Проверка легальности установленных программ")
-root.iconbitmap('data\\LicenseCheker.ico')
+root.title("LicenseChecker - Проверка легальности установленных программ")
+root.iconbitmap('data\\LicenseChecker.ico')
 katalog=''
 
 #Функция для меню
@@ -36,11 +36,11 @@ def WebStr():
     webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/")
 def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
-    webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/issues")
+    webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
 def PoiskZameni():
     """Поиск замены на сайте КонтинентСвободы.рф"""
     winPZ= Toplevel(root)
-    winPZ.iconbitmap('data\\LicenseCheker.ico')
+    winPZ.iconbitmap('data\\LicenseChecker.ico')
     winPZ.resizable(width=False, height=False)
     winPZ.title("Поиск замены на сайте КонтинентСвободы.рф")
     winPZ.minsize(width=200, height=210)
@@ -75,8 +75,8 @@ def PoiskZameni():
 def Spravka():
     """Справка о программе"""
     winSpravka = Tk()
-    winSpravka.iconbitmap('data\\LicenseCheker.ico')
-    winSpravka.title("Справка о программе LicenseCheker")
+    winSpravka.iconbitmap('data\\LicenseChecker.ico')
+    winSpravka.title("Справка о программе LicenseChecker")
     winSpravka.geometry("400x180")
     winSpravka.resizable(width=False, height=False)
     tab_control = ttk.Notebook(winSpravka)
@@ -136,7 +136,7 @@ def UpdateProg():
     """проверка наличия новой версии программы"""
     #my_version = '0.3'
     try:
-        f = urllib.request.urlopen("https://github.com/mrkaban/LicenseCheker/raw/master/version")
+        f = urllib.request.urlopen("https://github.com/mrkaban/LicenseChecker/raw/master/version")
         h = str(f.read())
     except:
         messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
@@ -147,7 +147,7 @@ def UpdateProg():
         try:
             messagebox.showinfo("Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
 Скачайте подходящую для Вас версию. Если не получается найти файлы, нажмите на \'Assets\'.")
-            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseCheker/releases")
+            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/releases")
         except:
             messagebox.showerror("Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
             return
@@ -217,7 +217,7 @@ def UpdateBase():
 def ViewBD():
     """Поиск и просмотр базы данных"""
     winBD= Toplevel(root)
-    winBD.iconbitmap('data\\LicenseCheker.ico')
+    winBD.iconbitmap('data\\LicenseChecker.ico')
     winBD.resizable(width=False, height=False)
     winBD.title("Поиск и просмотр базы данных")
     winBD.minsize(width=400, height=200)
@@ -338,16 +338,16 @@ def ViewBD():
 def about():
     """окно о программе"""
     winAbout= Toplevel(root)
-    winAbout.iconbitmap('data\\LicenseCheker.ico')
+    winAbout.iconbitmap('data\\LicenseChecker.ico')
     winAbout.resizable(width=False, height=False)
-    winAbout.title("О программе LicenseCheker")
+    winAbout.title("О программе LicenseChecker")
     winAbout.minsize(width=400, height=100)
-    img = Image.open("data\\LicenseCheker.png")
+    img = Image.open("data\\LicenseChecker.png")
     render = ImageTk.PhotoImage(img)
     initil = Label(winAbout, image=render)
     initil.image = render
     initil.pack(side = "left")
-    lab=Label(winAbout, text="LicenseCheker 1.0", justify="left", font='Arial 14 bold')
+    lab=Label(winAbout, text="LicenseChecker 1.0", justify="left", font='Arial 14 bold')
     lab.pack(side = "top")
     lab4=Label(winAbout, text="\nЦель: Помочь разобраться с лицензиями \nна программное обеспечение", justify="left")
     lab4.pack()
@@ -361,7 +361,7 @@ def about():
 def RuchSearchProg():
     """Ручной поиск программ"""
     winRuch= Toplevel(root)
-    winRuch.iconbitmap('data\\LicenseCheker.ico')
+    winRuch.iconbitmap('data\\LicenseChecker.ico')
     winRuch.resizable(width=False, height=False)
     winRuch.title("Ручной поиск программ в указанной директории")
     #winRuch.minsize(width=400, height=200)
@@ -541,7 +541,7 @@ def RuchSearchProg():
             <html>
             <head>
             </head>
-        <h1 align=center>Отчет ручного поиска LicenseCheker</h1>"""
+        <h1 align=center>Отчет ручного поиска LicenseChecker</h1>"""
         SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
         SbHTML = SbHTML + """
         <html>
@@ -643,7 +643,7 @@ def SaveAuto():
         <html>
         <head>
         </head>
-    <h1 align=center>Отчет автопоиска LicenseCheker</h1>"""
+    <h1 align=center>Отчет автопоиска LicenseChecker</h1>"""
     SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
     SbHTML = SbHTML + """
     <html>
@@ -680,7 +680,7 @@ def SaveAuto():
 def MediaSearch():
     """Ручной поиск программ"""
     winMedia= Toplevel(root)
-    winMedia.iconbitmap('data\\LicenseCheker.ico')
+    winMedia.iconbitmap('data\\LicenseChecker.ico')
     winMedia.resizable(width=False, height=False)
     winMedia.title("Поиск медиа файлов (аудио, видео, изображения) в указанной директории")
     #winMedia.minsize(width=480, height=200)
@@ -799,7 +799,7 @@ def MediaSearch():
             <html>
             <head>
             </head>
-        <h1 align=center>Отчет медиа поиска LicenseCheker</h1>"""
+        <h1 align=center>Отчет медиа поиска LicenseChecker</h1>"""
         SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
         SbHTML = SbHTML + """
         <html>
@@ -983,7 +983,7 @@ for itemsoft in software_list:
     i += 1
 def DoubleClic(event): #Функция для события двойного клика
     winMore= Toplevel(root)
-    winMore.iconbitmap('data\\LicenseCheker.ico')
+    winMore.iconbitmap('data\\LicenseChecker.ico')
     winMore.resizable(width=False, height=False)
     i1 = 1
     try:

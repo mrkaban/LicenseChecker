@@ -99,7 +99,7 @@ def StartSeachKey(path):
             continue
     return d
 
-#StartSeachKey("D:\Public\LicenseCheker")
+#StartSeachKey("D:\Public\LicenseChecker")
 # try:
 #     tt = StartSeachKey("C:\Program Files\\")
 #     print(tt)
