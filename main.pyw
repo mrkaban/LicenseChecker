@@ -31,9 +31,9 @@ katalog=''
 def close_win():
     """Закрываем окно"""
     sys.exit()
-def WebStr():
+def WebStr(self=None):
     """открытие веб-страницы в браузере по умолчанию"""
-    webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/")
+    webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/%D1%83%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B/%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0/licensechecker-%D0%BB%D0%B5%D0%B3%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC.html")
 def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
@@ -134,15 +134,13 @@ def Spravka():
     winSpravka.mainloop()
 def UpdateProg():
     """проверка наличия новой версии программы"""
-    #my_version = '0.3'
     try:
         f = urllib.request.urlopen("https://github.com/mrkaban/LicenseChecker/raw/master/version")
         h = str(f.read())
     except:
         messagebox.showerror("Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.0', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #if my_version != h:
+    search_exemple = re.search(r'1.1', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if not search_exemple:
         try:
             messagebox.showinfo("Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
@@ -347,7 +345,7 @@ def about():
     initil = Label(winAbout, image=render)
     initil.image = render
     initil.pack(side = "left")
-    lab=Label(winAbout, text="LicenseChecker 1.0", justify="left", font='Arial 14 bold')
+    lab=Label(winAbout, text="LicenseChecker 1.1", justify="left", font='Arial 14 bold')
     lab.pack(side = "top")
     lab4=Label(winAbout, text="\nЦель: Помочь разобраться с лицензиями \nна программное обеспечение", justify="left")
     lab4.pack()
@@ -368,7 +366,7 @@ def RuchSearchProg():
     winRuch.geometry("900x300")
     frameRuch2 = Frame(winRuch)
 
-    kol_kat = None
+    kol_kat = 1
     def UkazatOdinKatalog():
         global kol_kat
         btnRuchMen.config(text="1 каталог")
@@ -377,6 +375,7 @@ def RuchSearchProg():
         global kol_kat
         btnRuchMen.config(text="2 каталога")
         kol_kat = 2
+        print(kol_kat)
     def UkazatTriKataloga():
         global kol_kat
         btnRuchMen.config(text="3 каталога")
@@ -398,8 +397,9 @@ def RuchSearchProg():
     slovarSave= {}
     size_list=[]
     size2 = None
-    kol_kat == None
+    #kol_kat == None
     spisok_katalogov = []
+    UkazatOdinKatalog()
     def OpenKatalog():
         """Открыть каталог"""
         global kol_kat
@@ -489,6 +489,7 @@ def RuchSearchProg():
              for row in records:
                  treeRuch.insert("" , i-1, text=i, values=(slovar[itemsoft], row[1], row[2], row[3], row[4]))
                  size_list.append(((len(slovar[itemsoft]))*6))
+                 #print((len(slovar[itemsoft])*6), '=', slovar[itemsoft])
                  #Создаю словари внутри словаря
                  slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                  added = True
@@ -510,8 +511,12 @@ def RuchSearchProg():
         CurBLproRuch.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproRuch.close()
         for itemsize in size_list:
-            if size2 <= int(itemsize):
-                size2 = int(itemsize)
+            if int(itemsize) < 500:
+                #print(itemsize)
+                if size2 <= int(itemsize):
+                    size2 = int(itemsize)
+            else:
+                continue
 
         if size2 == None:
             size2 = 350
@@ -683,7 +688,7 @@ def MediaSearch():
     winMedia.iconbitmap('data\\LicenseChecker.ico')
     winMedia.resizable(width=False, height=False)
     winMedia.title("Поиск медиа файлов (аудио, видео, изображения) в указанной директории")
-    #winMedia.minsize(width=480, height=200)
+    winMedia.minsize(width=530, height=200)
     #winMedia.geometry("480x200")
     frameMed2 = Frame(winMedia)
     L2 = Label(frameMed2, text="Укажите каталог для поиска медиа файлов и нажмите кнопку 'Поиск'")
@@ -772,27 +777,37 @@ def MediaSearch():
             slovarMediaSave[slovar[itemsoft]] = {'File':slovar[itemsoft], 'Tip':TipFile, 'Size':razmerFileStr}
             i += 1
             size2= 0
+
             for itemsize in size_list:
-                if size2 <= int(itemsize):
-                    size2 = int(itemsize)
+                if int(itemsize) < 550:
+                    #print(itemsize)
+                    if size2 <= int(itemsize):
+                        size2 = int(itemsize)
+                else:
+                    continue
+
+            # for itemsize in size_list:
+            #     print(itemsize)
+            #     if size2 <= int(itemsize):
+            #         size2 = int(itemsize)
             if size2 == None:
                 size2 = 350
             if size2 < 350:
                 size2 = 350
             #treeMed["columns"]=("Name", "Type", "Size")
-            #winMedia.minsize(width=size2+180, height=200)
-            # frameMed=Frame(winMedia,width=size2+180)
-            # treeMed.column("#0", width=50)
-            # treeMed.column("Name", width=size2, stretch=True)
-            # treeMed.column("Type", width=150, stretch=True)
-            # treeMed.column("Size", width=120, stretch=True)
-            # treeMed.heading("#0", text="№:")
-            # treeMed.heading("Name", text="Имя файла:")
-            # treeMed.heading("Type", text="Тип:")
-            # treeMed.heading("Size", text="Размер:")
-            # treeMed.pack(side = LEFT, expand=True)
-            # frameMed2.pack(side = TOP, expand=True)
-            # frameMed.pack(side = BOTTOM, expand=True)
+            winMedia.minsize(width=size2+180, height=200)
+            frameMed=Frame(winMedia,width=size2+180)
+            treeMed.column("#0", width=50)
+            treeMed.column("Name", width=size2, stretch=True)
+            treeMed.column("Type", width=150, stretch=True)
+            treeMed.column("Size", width=120, stretch=True)
+            treeMed.heading("#0", text="№:")
+            treeMed.heading("Name", text="Имя файла:")
+            treeMed.heading("Type", text="Тип:")
+            treeMed.heading("Size", text="Размер:")
+            #treeMed.pack(side = LEFT, expand=True)
+            #frameMed2.pack(side = TOP, expand=True)
+            #frameMed.pack(side = BOTTOM, expand=True)
     def SaveMedia():
         """Сохранить отчет в HTML"""
         SbHTML = """
