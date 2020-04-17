@@ -86,7 +86,7 @@
     </property>
     <addaction name="mSaveAvto"/>
     <addaction name="separator"/>
-    <addaction name="action_3"/>
+    <addaction name="mExit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -103,8 +103,8 @@
     </property>
     <addaction name="action_8"/>
     <addaction name="action_9"/>
-    <addaction name="action_10"/>
-    <addaction name="action_11"/>
+    <addaction name="mWebStr"/>
+    <addaction name="mWebHelp"/>
     <addaction name="action_12"/>
     <addaction name="action_13"/>
    </widget>
@@ -124,7 +124,7 @@
     <enum>QAction::NoRole</enum>
    </property>
   </action>
-  <action name="action_3">
+  <action name="mExit">
    <property name="text">
     <string>Выход</string>
    </property>
@@ -159,12 +159,12 @@
     <string>Справка</string>
    </property>
   </action>
-  <action name="action_10">
+  <action name="mWebStr">
    <property name="text">
     <string>Официальный сайт</string>
    </property>
   </action>
-  <action name="action_11">
+  <action name="mWebHelp">
    <property name="text">
     <string>Служба поддержки</string>
    </property>

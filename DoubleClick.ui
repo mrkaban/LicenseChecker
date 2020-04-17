@@ -20,6 +20,9 @@
    <iconset>
     <normaloff>data/LicenseChecker.ico</normaloff>data/LicenseChecker.ico</iconset>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QTableWidget" name="tableWidget">
    <property name="geometry">
     <rect>

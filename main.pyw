@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QTableWidgetItem
-from CheckOS import DetectOS, get_windows_product_key_from_reg, get_windows_product_key_from_wmi, sled_activation
+from CheckOS import *
 import sys
 from reestr import foo #функция получения данных из реестра
 import winreg #Нужна для работы со значением типа реестр
@@ -11,12 +11,15 @@ from filtr import filter #Фильтрация автопоиска
 import sqlite3 #База данных SQLite
 from datetime import datetime #какая дата и время
 import socket #Для получения имени компьютера
+import webbrowser #Для открытия веб-страницы
+import os #Для поиска файлов
+from SearchKey import * #Поиск слов купить и т.п. в папке с программой
+from poisklicsogl import *
 
 app = QtWidgets.QApplication([])
 win = uic.loadUi("main.ui") #графика главного окна
 win.setFixedSize(801, 276)
 winMore = uic.loadUi("DoubleClick.ui") #графика главного окна
-winMore.setFixedSize(551, 281)
 
 
 def Avtopoisk(self=None):
@@ -95,6 +98,67 @@ def Avtopoisk(self=None):
         data.append(('Тип ПО:', win.tableWidget.item(item.row(), 1).text()))
         data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
         data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
+        try: #Заполняем путь из реестра
+            data.append(('Путь:', IntallPath[s]))
+        except KeyError: #если в реестре он не указан
+            data.append(('Стоимость:', 'Неизвестно'))
+        try:#Ищим основной исполняемый для подтверждения
+            dir = IntallPath[s] + '\\' #IndexError:
+            for root1, dirs, files in os.walk(dir):
+                # пройти по директории рекурсивно
+                for name in files:
+                    if name==spisokExe[0]:
+                        fullname = os.path.join(root1, name) # получаем полное имя файла
+                        data.append(('Подтверждение:', fullname))
+        except KeyError:
+            data.append(('Подтверждение:', 'Не найдено'))
+        except IndexError:
+            data.append(('Подтверждение:', 'Не найдено'))
+        try:#поиск слов купить, как доп вариант опознавания платных программ
+            if (len(IntallPath[s]))>2:
+                h=StartSeachKey(IntallPath[s])
+                h1 = h[0]
+                data.append(('Поиск слов "Купить":', h1['path']))
+            else:
+                data.append(('Поиск слов "Купить":', 'Не найдены'))
+        except:
+            data.append(('Поиск слов "Купить":', 'Не найдены'))
+        #Поиск ключа Windows и следов активации
+        search_exemple = re.search( r'Windows', s, re.M|re.I)
+        if search_exemple:
+            data.append(('Ключ Windows:', get_windows_product_key_from_reg()))
+            i1 = 1
+            i2 = 0
+            sled_spisok = sled_activation()
+            for sled in sled_spisok:
+                if i1 <= i2:
+                    data.append(('-', sled))
+                    i1 += 1
+                    i2 += 1
+                else:
+                    data.append(('Следы активации:', sled))
+                    i1 += 1
+                    i2 = i1
+        #Поиск лицензионного соглашения
+        try:
+            if (len(IntallPath[s])) > 0:
+                spisok_lic_sogl = poisk_lic_sogl(IntallPath[s])
+                i1=1
+                i2 = 0
+                for lic_sogl in spisok_lic_sogl:
+                    if i1 <= i2:
+                        data.append(('-', lic_sogl))
+                        i1 += 1
+                        i2 += 1
+                    else:
+                        data.append(('Лицензионное соглашение:', lic_sogl))
+                        i1 += 1
+                        i2 = i1
+            else:
+                data.append(('Лицензионное соглашение:', 'Не найдено'))
+        except KeyError:
+            data.append(('Лицензионное соглашение:', 'Корневой каталог приложения не указан'))
+
         winMore.tableWidget.setRowCount(len(data))
         winMore.tableWidget.setColumnCount(2)
         winMore.tableWidget.setHorizontalHeaderLabels(
@@ -114,6 +178,27 @@ def Avtopoisk(self=None):
         winMore.tableWidget.setColumnWidth(2, 50)
         winMore.tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
 
+        try:
+            if 351<=((len(h1['path']))*6):
+                size1 = (len(h1['path']))*6 #пробую задать ширину окна по содержимому
+            else:
+                size1 = 351
+        except:
+            try:
+                if 351<=((len(h1['path']))*6):
+                    size1 = (len(IntallPath[s]))*6
+                else:
+                    size1 = 351
+            except:
+                size1 = 351
+        winMore.resize(size1+200, 281)
+        winMore.tableWidget.resize(size1+200, 281)
+        x = size1+200
+        y = 281
+        winMore.move(x, y)
+        winMore.setFixedSize(x, 281)
+        CurDC.close()
+        BaseDC.close()
         winMore.show()
 
     def SaveAvto():
@@ -179,6 +264,21 @@ def Avtopoisk(self=None):
         row += 1
     win.tableWidget.setColumnWidth(1, 150)
     win.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+
+#Заполняю пункты меню
+def close_win(): #Вкладка Файл \ Выход
+    """Закрываем окно"""
+    sys.exit()
+win.mExit.triggered.connect(close_win)
+def WebStr(self=None): #Вкладка ? \ Официальный сайт
+    """открытие веб-страницы в браузере по умолчанию"""
+    webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/%D1%83%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B/%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0/licensechecker-%D0%BB%D0%B5%D0%B3%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC.html")
+win.mWebStr.triggered.connect(WebStr)
+def WebHelp():
+    """открытие веб-страницы в браузере по умолчанию"""
+    webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
+win.mWebHelp.triggered.connect(WebHelp)
+
 
 Avtopoisk()
 win.show()
