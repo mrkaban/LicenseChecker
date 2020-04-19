@@ -15,11 +15,18 @@ import webbrowser #Для открытия веб-страницы
 import os #Для поиска файлов
 from SearchKey import * #Поиск слов купить и т.п. в папке с программой
 from poisklicsogl import *
+import urllib.request #для проверки наличия новых версий
 
 app = QtWidgets.QApplication([])
 win = uic.loadUi("main.ui") #графика главного окна
 win.setFixedSize(801, 276)
-winMore = uic.loadUi("DoubleClick.ui") #графика главного окна
+winMore = uic.loadUi("DoubleClick.ui") #графика подробности по двойному клику в автопоиске
+winPoiskZamen = uic.loadUi("PoisZamen.ui") #графика поиск замен
+winSpravka = uic.loadUi("Spravka.ui") #графика справка
+winViewBD = uic.loadUi("ViewBD.ui") #графика поиск в базе
+winAbout = uic.loadUi("About.ui") #графика О программе
+winRuchPoisk = uic.loadUi("RuchPoisk.ui") #графика Ручной поиск
+winMediaPoisk = uic.loadUi("Media.ui") #графика медиа поиск
 
 
 def Avtopoisk(self=None):
@@ -52,8 +59,10 @@ def Avtopoisk(self=None):
         added = False
         for row in records:
             #tree.insert("" , i-1, text=i, values=(NameP, row[2], row[3], row[4]))
-            data.append((NameP, row[2], row[3], row[4]))
-            slovarSave[NameP] = {'Name':NameP, 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
+            h = row[4]
+            h = h.replace("\n", "")
+            data.append((NameP, row[2], row[3], h))
+            slovarSave[NameP] = {'Name':NameP, 'TipPO':row[2], 'License':row[3], 'Cena':h}
             added = True
             break
         if added == False:
@@ -99,17 +108,21 @@ def Avtopoisk(self=None):
         data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
         data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
         try: #Заполняем путь из реестра
-            data.append(('Путь:', IntallPath[s]))
+            if os.path.exists(IntallPath[s]):
+                data.append(('Путь:', IntallPath[s]))
         except KeyError: #если в реестре он не указан
             data.append(('Стоимость:', 'Неизвестно'))
         try:#Ищим основной исполняемый для подтверждения
             dir = IntallPath[s] + '\\' #IndexError:
+            dir = dir.replace("/", "\\")
+            dir = dir.replace("\\\\", "\\")
             for root1, dirs, files in os.walk(dir):
                 # пройти по директории рекурсивно
                 for name in files:
                     if name==spisokExe[0]:
                         fullname = os.path.join(root1, name) # получаем полное имя файла
-                        data.append(('Подтверждение:', fullname))
+                        if os.path.exists(fullname):
+                            data.append(('Подтверждение:', fullname))
         except KeyError:
             data.append(('Подтверждение:', 'Не найдено'))
         except IndexError:
@@ -175,8 +188,10 @@ def Avtopoisk(self=None):
                 col += 1
 
             row += 1
+        winMore.tableWidget.resizeColumnsToContents()
         winMore.tableWidget.setColumnWidth(2, 50)
         winMore.tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+
 
         try:
             if 351<=((len(h1['path']))*6):
@@ -262,6 +277,7 @@ def Avtopoisk(self=None):
             col += 1
 
         row += 1
+    win.tableWidget.resizeColumnsToContents()
     win.tableWidget.setColumnWidth(1, 150)
     win.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
 
@@ -278,8 +294,545 @@ def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
 win.mWebHelp.triggered.connect(WebHelp)
+def PoiskZamen():
+    """Поиск замены на сайте КонтинентСвободы.рф"""
+    winPoiskZamen.setFixedSize(587, 230)
+    def KnopkaPoiskDliaZamen():
+        """Кнопка поиск замен"""
+        textp = winPoiskZamen.leKluch.text()
+        if textp == None or textp == '':
+            return True
+        if textp.find(" ", 0, len(textp)) >= 1: #Только отдельно, удаление кавычек
+             textp = textp.replace(" ", '+')
+        url_kluch = 'https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/component/search/?searchword='+textp
+        webbrowser.open_new_tab(url_kluch)
+    winPoiskZamen.pbPosik.clicked.connect(KnopkaPoiskDliaZamen)
+    winPoiskZamen.leKluch.returnPressed.connect(KnopkaPoiskDliaZamen)
+    winPoiskZamen.show()
+win.mPoiskZameni.triggered.connect(PoiskZamen)
+def Spravka():
+    """Справка о программе"""
+    winSpravka.setFixedSize(463, 301)
+    winSpravka.show()
+win.mSpravka.triggered.connect(Spravka)
+def UpdateProg():
+    """проверка наличия новой версии программы"""
+    try:
+        f = urllib.request.urlopen("https://github.com/mrkaban/LicenseChecker/raw/master/version")
+        h = str(f.read())
+    except:
+        #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
+        QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
+        return
+    search_exemple = re.search(r'1.1', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if not search_exemple:
+        try:
+            QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
+Скачайте подходящую для Вас версию. Если не получается найти файлы, нажмите на \'Assets\'.")
+            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/releases")
+        except:
+            QMessageBox.critical(win, "Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
+            return
+    else:
+        QMessageBox.about(win, "Программа актуальна", "Используемая Вами версия программы актуальна.")
+win.mUpdateProg.triggered.connect(UpdateProg)
+def UpdateBase():
+    """Обновление базы данных Lpro.db"""
+    BaseUpdateBase = sqlite3.connect(r"data\Lpro.db", uri=True)
+    BaseUpdateBase.row_factory = sqlite3.Row #подключаем базу данных и курсор
+    CurUpdateBase = BaseUpdateBase.cursor()
+    s1 = 'SELECT * FROM version WHERE date'
+    CurUpdateBase.execute(s1)
+    records = CurUpdateBase.fetchall()
+    try:
+        f = urllib.request.urlopen("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/images/lpro-base-version.txt")
+        h = str(f.read())
+        h = h.replace("'", "")
+        h = h.replace("b", "")
+    except:
+        QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений базы данных.")
+        return
+    for row in records:
+        g = str(row[0])
+        g = g.replace(" ", "")
+        if g != h:
+            try:
+                bd1 = urllib.request.urlopen("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/images/Lpro.db").read()
+                f = open("data\\Lpro.db", "wb")
+                f.write(bd1)
+                f.close()
+                #синхронизируем пользовательскую базу данных
+                sinh = False
+                try:
+                    BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
+                    BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
+                    CurUserSinh = BaseUserSinh.cursor()
+                    s = 'SELECT * FROM UserProgram'
+                    CurUserSinh.execute(s)
+                    records = CurUserSinh.fetchall()
+                    zapis_v_lpro = []
+                    r = 20000
+                    for row in records:
+                        f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
+                        zapis_v_lpro.append(f)
+                        r = r + 1
+                    CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
+                    BaseUpdateBase.commit()
+                    sinh = True
+                except:
+                    QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
+базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+                    sinh = False
+                if sinh == False:
+                    txt1 = "База данных успешно обновлена до версии " + h + "!"
+                else:
+                    txt1 = "База данных успешно обновлена до версии " + h + "!" + "Пользовательская база данных успешно\
+синхронизиррована с основной базой."
+                QMessageBox.about(win, "База обновлена", txt1)
+            except:
+                QMessageBox.critical(win, "Не удалось загрузить БД", "Не удалось загрузить базу данных.")
+                break
+        else:
+            QMessageBox.about(win, "База данных актуальна", "Обновление базы данных не требуется.")
 
+    CurUpdateBase.close() #Закрываю соединение с базой и с курсором для базы
+    BaseUpdateBase.close()
+win.mUpdateBase.triggered.connect(UpdateBase)
 
+def ViewBD():
+    """Поиск и просмотр базы данных"""
+    #if textbd == None or textbd == '': если поле пусто, завершить функцию
+    #    return True
+    def ViewBDDlyaKnopki(event=None):
+        """Функция для кнопки поиск"""
+        name_user_prog =winViewBD.leKluchBD.text()
+        winViewBD.tableWidgetBD.clear()
+        BaseLproVDB = sqlite3.connect(r"data\Lpro.db", uri=True)
+        BaseLproVDB.row_factory = sqlite3.Row #подключаем базу данных и курсор
+        CurBLproVDB = BaseLproVDB.cursor()
+        s = 'SELECT * FROM program WHERE (name LIKE "%%' + name_user_prog + '%%")'
+        CurBLproVDB.execute(s)
+        records = CurBLproVDB.fetchall()
+        size_list=[]
+        dataBD = []
+        size2 = None
+        added = False
+        i = 1
+        for row in records:
+            size2= 0
+            h = row[4]
+            h = h.replace("\n", "")
+            dataBD.append((row[1], row[2], row[3], h))
+            size_list.append(((len(row[1]))*6))
+            added = True
+            i += 1
+            if added == False:
+                i = i -1
+        CurBLproVDB.close() #Закрываю соединение с базой и с курсором для базы
+        BaseLproVDB.close()
+
+        for itemsize in size_list:
+            if size2 <= int(itemsize):
+                size2 = int(itemsize)
+        if size2 == None:
+            size2 = 300
+        if size2 < 300:
+            size2 = 300
+        winViewBD.tableWidgetBD.setRowCount(len(dataBD))
+        winViewBD.tableWidgetBD.setColumnCount(4)
+        winViewBD.tableWidgetBD.setHorizontalHeaderLabels(
+                ('Название:', 'Тип:', 'Лицензия:', '~Цена:')
+            )
+        row = 0
+        for tup in dataBD:
+            col = 0
+            for item in tup:
+                cellinfo = QTableWidgetItem(item)
+                cellinfo.setFlags(
+                            Qt.ItemIsSelectable | Qt.ItemIsEnabled
+                        )
+                winViewBD.tableWidgetBD.setItem(row, col, cellinfo)
+                col += 1
+
+            row += 1
+        winViewBD.tableWidgetBD.resizeColumnsToContents()
+        winViewBD.tableWidgetBD.setColumnWidth(1, 150)
+        winViewBD.tableWidgetBD.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+
+    winViewBD.pbPoiskBD.clicked.connect(ViewBDDlyaKnopki)
+    winViewBD.leKluchBD.returnPressed.connect(ViewBDDlyaKnopki)
+    try:
+        if 300<=((len(h1['path']))*6):
+            size1 = (len(h1['path']))*6 #пробую задать ширину окна по содержимому
+        else:
+            size1 = 300
+    except:
+        try:
+            if 300<=((len(h1['path']))*6):
+                size1 = (len(IntallPath[s]))*6
+            else:
+                size1 = 300
+        except:
+            size1 = 300
+    winViewBD.tableWidgetBD.resizeColumnsToContents()
+    winViewBD.resize(size1+410, 270)
+    winViewBD.tableWidgetBD.resize(size1+410, 201)
+    x = size1+410
+    y = 270
+    winViewBD.move(x, y)
+    winViewBD.setFixedSize(x, 270)
+    #winViewBD.setFixedSize(710, 270)
+    winViewBD.show()
+win.mViewBD.triggered.connect(ViewBD)
+def About():
+    """Окно о программе"""
+    winAbout.setFixedSize(424, 241)
+    winAbout.show()
+win.mAbout.triggered.connect(About)
+def RuchPoisk():
+    """Ручной поиск программ"""
+    winRuchPoisk.setFixedSize(891, 289)
+    slovarSave= {}
+    size_list=[]
+    size2 = None
+    dirlist = []
+    def OpenKatalog():
+        """Открыть каталог"""
+        winRuchPoisk.leKatalog.setText("")
+        winRuchPoisk.tableWidgetRuch.clear()
+        dirlist.clear()
+        if winRuchPoisk.rb1kat.isChecked():
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            winRuchPoisk.leKatalog.setText(dirlist[0])
+        if winRuchPoisk.rb2kat.isChecked():
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1])
+        if winRuchPoisk.rb3kat.isChecked():
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать третий каталог для поиска остатков программ",".")
+            dirlist.append(d)
+            winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1] + ' ' + dirlist[2])
+    winRuchPoisk.pbObzor.clicked.connect(OpenKatalog)
+    def ButtonRuchPoisk():
+        """Функция для кнопки поиск"""
+        winRuchPoisk.tableWidgetRuch.clear()
+        spisok=[]
+        slovar={}
+        try:
+            if dirlist[0] == '' or dirlist[0] == None:
+                if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+                    return
+        except IndexError:
+            if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+                return
+        if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+            if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+                return
+        if winRuchPoisk.rb1kat.isChecked():
+            try:
+                dir = dirlist[0]
+            except:
+                dir = winRuchPoisk.leKatalog.text()
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                 for name in files:
+                     if name[-4:]=='.exe':
+                         fullname = os.path.join(root, name) # получаем полное имя файла
+                         fullname = fullname.replace("/", "\\")
+                         slovar[name]=fullname
+                         spisok.append(name)
+        if winRuchPoisk.rb2kat.isChecked():
+            try:
+                dir = dirlist[0]
+            except:
+                QMessageBox.critical(winRuchPoisk, "Ошибка", "Вручную можно указать только 1 каталог.")
+                return
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = dirlist[1]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+        if winRuchPoisk.rb3kat.isChecked():
+            try:
+                dir = dirlist[0]
+            except:
+                QMessageBox.critical(winRuchPoisk, "Ошибка", "Вручную можно указать только 1 каталог.")
+                return
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = dirlist[1]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+            dir = dirlist[2]
+            for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
+                for name in files:
+                    if name[-4:]=='.exe':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+        BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
+        BaseLproRuch.row_factory = sqlite3.Row #подключаем базу данных и курсор
+        CurBLproRuch = BaseLproRuch.cursor()
+        data = []
+        added = False #Для отслеживания добавлен вариант из списка или нет
+        for itemsoft in spisok: #В списке имена файлом с расширением exe
+             NameP=itemsoft
+             NamePF = NameP.replace((NameP[NameP.find('.exe'):]), '')
+             s = 'SELECT * FROM program WHERE (file LIKE "' + NamePF + '")'
+             CurBLproRuch.execute(s)
+             records = CurBLproRuch.fetchall()
+             for row in records:
+                 h = row[4]
+                 h = h.replace("\n", "")
+                 data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+                 size_list.append(((len(slovar[itemsoft]))*6))
+                 #print((len(slovar[itemsoft])*6), '=', slovar[itemsoft])
+                 #Создаю словари внутри словаря
+                 slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
+                 added = True
+             if added == False:
+                  #i = i -1
+                 #Если не найдено в поле file, тогда ищем в поле name
+                 s = 'SELECT * FROM program WHERE (name LIKE "' + NamePF + '%%")'
+                 CurBLproRuch.execute(s)
+                 records = CurBLproRuch.fetchall()
+                 for row in records:
+                     h = row[4]
+                     h = h.replace("\n", "")
+                     data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+                     size_list.append(((len(slovar[itemsoft]))*6))
+                     #Создаю словари внутри словаря
+                     slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
+                     added = True
+        CurBLproRuch.close() #Закрываю соединение с базой и с курсором для базы
+        BaseLproRuch.close()
+        winRuchPoisk.tableWidgetRuch.setRowCount(len(data))
+        winRuchPoisk.tableWidgetRuch.setColumnCount(5)
+        winRuchPoisk.tableWidgetRuch.setHorizontalHeaderLabels(
+                ('Название:', "В базе:", 'Тип:', 'Лицензия:', '~Цена:')
+            )
+        row = 0
+        for tup in data:
+            col = 0
+            for item in tup:
+                cellinfo = QTableWidgetItem(item)
+                cellinfo.setFlags(
+                            Qt.ItemIsSelectable | Qt.ItemIsEnabled
+                        )
+                winRuchPoisk.tableWidgetRuch.setItem(row, col, cellinfo)
+                col += 1
+
+            row += 1
+        winRuchPoisk.tableWidgetRuch.resizeColumnsToContents()
+        winRuchPoisk.tableWidgetRuch.setColumnWidth(1, 150)
+        winRuchPoisk.tableWidgetRuch.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+    winRuchPoisk.pbPoisk.clicked.connect(ButtonRuchPoisk)
+    winRuchPoisk.leKatalog.returnPressed.connect(ButtonRuchPoisk)
+    def SaveRuch():
+        """Сохранить отчет в HTML"""
+        SbHTML = """
+            <html>
+            <head>
+            </head>
+        <h1 align=center>Отчет ручного поиска LicenseChecker</h1>"""
+        SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+        SbHTML = SbHTML + """
+        <html>
+        <table border=1 align=center>
+        <tr><td> Название в БД
+        <td> Путь
+        <td> Тип ПО
+        <td> Лицензия
+        <td> Стоимость
+        </tr>
+            """
+        s=''
+        s1=''
+        for itemsoft in slovarSave:
+            s = slovarSave[itemsoft]
+            s1 = '<tr><td> ' + s['Name'] + '\n' + '<td> ' + s['Address'] + '\n' + '<td> ' + s['TipPO'] + '\n'
+            s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + s['Cena'] + '\n'
+            SbHTML = SbHTML + s1
+        s2 = """
+            </table>
+            <p align=center>Официальный сайт: <a href="http://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
+            </html>
+            """
+        SbHTML = SbHTML + s2
+        ftypes = [('HTML', '.html')] #Указываю тип расширение
+        options = QFileDialog.Options()
+        fileName = QFileDialog.getSaveFileName(winRuchPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
+        try:
+            f = open(fileName[0],'w+')
+            f.write(SbHTML) #Записываем в файл
+            f.close()
+            QMessageBox.about(winRuchPoisk, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
+        except:
+            QMessageBox.about(winRuchPoisk, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
+    winRuchPoisk.pbSave.clicked.connect(SaveRuch)
+    winRuchPoisk.show()
+win.mRuchPoisk.triggered.connect(RuchPoisk)
+def MediaPoisk():
+    """Ручной поиск программ"""
+    winMediaPoisk.setFixedSize(819, 273)
+    size_list=[]
+    size2 = None
+    slovarMediaSave= {}
+    katalog = None
+    def OpenMedKatalog():
+        """Открыть каталог"""
+        global katalog
+        katalog = None
+        winMediaPoisk.leKatalog.setText("")
+        #winMediaPoisk.tableWidgetMedia.clear()
+        katalog = QFileDialog.getExistingDirectory(winMediaPoisk,"Указать каталог для медиа-файлов",".")
+        winMediaPoisk.leKatalog.setText(katalog)
+    winMediaPoisk.pbObzor.clicked.connect(OpenMedKatalog)
+    def ButtonMediaPoisk():
+        """Функция для кнопки поиск"""
+        global katalog
+        try:
+            if katalog == None:
+                return
+        except IndexError:
+            return
+        except NameError:
+            return
+        winMediaPoisk.tableWidgetMedia.clear()
+        spisok=[]
+        slovar={}
+        data=[]
+        for root, dirs, files in os.walk(katalog):
+             # пройти по директории рекурсивно
+             SpisokFormatov = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd', '.mpeg', '.flv', '.mov', '.m4a', '.ac3', '.aac',
+             '.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.ogg', '.vob', '.wma', '.mp3', '.wav', '.mpg', '.wmv']
+             for name in files:
+                 for format in SpisokFormatov:
+                     if name[-4:]==format:
+                         fullname = os.path.join(root, name) # получаем полное имя файла
+                         fullname = fullname.replace("/", "\\")
+                         slovar[name]=fullname
+                         try: #Проверяем минимальный размер
+                             r = int(winMediaPoisk.leMinSize.text())
+                             f = ((os.path.getsize(fullname))/1024)/1024
+                             if f < r:
+                                 continue
+                         except:
+                             print('Исключение при сравнении размера файлов', fullname)
+                         spisok.append(name)
+                         size_list.append(((len(fullname))*6))
+        i = 1
+        for itemsoft in spisok:
+            NameP=itemsoft
+            ext = os.path.splitext(slovar[itemsoft])[1]
+            TipFile = '?'
+            SpImages = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd']
+            SpAudio = ['.m4a', '.ac3', '.aac', '.ogg', '.wma', '.mp3', '.wav']
+            SpVideo = ['.mpeg', '.flv', '.mov', '.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.vob', '.mov', '.mpg', '.wmv']
+            for format in SpImages:
+                if ext==format:
+                    TipFile = 'Изображение'
+            for format in SpAudio:
+                if ext==format:
+                    TipFile = 'Аудио'
+            for format in SpVideo:
+                if ext==format:
+                    TipFile = 'Видео'
+            razmerFile = os.path.getsize(slovar[itemsoft])
+            razmerFile = round(((razmerFile/1024)/1024), 2)
+            razmerFileStr = str(razmerFile) + ' МБ'
+            data.append((slovar[itemsoft], TipFile, razmerFileStr))
+            slovarMediaSave[slovar[itemsoft]] = {'File':slovar[itemsoft], 'Tip':TipFile, 'Size':razmerFileStr}
+        winMediaPoisk.tableWidgetMedia.setRowCount(len(data))
+        winMediaPoisk.tableWidgetMedia.setColumnCount(3)
+        winMediaPoisk.tableWidgetMedia.setHorizontalHeaderLabels(
+                    ("Имя файла:", "Тип:", "Размер:")
+                )
+        row = 0
+        for tup in data:
+            col = 0
+            for item in tup:
+                cellinfo = QTableWidgetItem(item)
+                cellinfo.setFlags(
+                                Qt.ItemIsSelectable | Qt.ItemIsEnabled
+                            )
+                winMediaPoisk.tableWidgetMedia.setItem(row, col, cellinfo)
+                col += 1
+
+            row += 1
+        winMediaPoisk.tableWidgetMedia.resizeColumnsToContents()
+        winMediaPoisk.tableWidgetMedia.setColumnWidth(1, 150)
+        winMediaPoisk.tableWidgetMedia.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+    winMediaPoisk.pbPoisk.clicked.connect(ButtonMediaPoisk)
+    winMediaPoisk.leKatalog.returnPressed.connect(ButtonMediaPoisk)
+    def SaveMedia():
+        """Сохранить отчет в HTML"""
+        SbHTML = """
+            <html>
+            <head>
+            </head>
+        <h1 align=center>Отчет медиа поиска LicenseChecker</h1>"""
+        SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+        SbHTML = SbHTML + """
+        <html>
+        <table border=1 align=center>
+        <tr><td> Имя файла
+        <td> Тип
+        <td> Размер
+        </tr>
+            """
+        s=''
+        s1=''
+        for itemsoft in slovarMediaSave:
+            s = slovarMediaSave[itemsoft]
+            s1 = '<tr><td> ' + s['File'] + '\n' + '<td> ' + s['Tip'] + '\n' + '<td> ' + s['Size'] + '\n'
+            SbHTML = SbHTML + s1
+        s2 = """
+            </table>
+            <p align=center>Официальный сайт: <a href="http://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
+            </html>
+            """
+        SbHTML = SbHTML + s2
+        ftypes = [('HTML', '.html')] #Указываю тип расширение
+        options = QFileDialog.Options()
+        fileMediaName = QFileDialog.getSaveFileName(winMediaPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
+        try:
+            g = open(fileMediaName[0],'w+', encoding='utf-8')
+            g.write(SbHTML) #Записываем в файл
+            g.close()
+            QMessageBox.about(winMediaPoisk, "Файл сохранен", "Файл успешно сохранен: " + fileMediaName[0])
+        except:
+            QMessageBox.about(winMediaPoisk, "Не удалось сохранить", "Не удалось сохранить файл: " + fileMediaName[0])
+    winMediaPoisk.pbSave.clicked.connect(SaveMedia)
+    winMediaPoisk.show()
+win.mMediaPoisk.triggered.connect(MediaPoisk)
 Avtopoisk()
 win.show()
 sys.exit(app.exec())

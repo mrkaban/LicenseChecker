@@ -92,21 +92,21 @@
     <property name="title">
      <string>Поиск</string>
     </property>
-    <addaction name="action_4"/>
-    <addaction name="action_5"/>
-    <addaction name="action_6"/>
-    <addaction name="action_7"/>
+    <addaction name="mRuchPoisk"/>
+    <addaction name="mMediaPoisk"/>
+    <addaction name="mViewBD"/>
+    <addaction name="mPoiskZameni"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
      <string>?</string>
     </property>
-    <addaction name="action_8"/>
-    <addaction name="action_9"/>
+    <addaction name="mAbout"/>
+    <addaction name="mSpravka"/>
     <addaction name="mWebStr"/>
     <addaction name="mWebHelp"/>
-    <addaction name="action_12"/>
-    <addaction name="action_13"/>
+    <addaction name="mUpdateBase"/>
+    <addaction name="mUpdateProg"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -129,32 +129,32 @@
     <string>Выход</string>
    </property>
   </action>
-  <action name="action_4">
+  <action name="mRuchPoisk">
    <property name="text">
     <string>Ручной поиск программ</string>
    </property>
   </action>
-  <action name="action_5">
+  <action name="mMediaPoisk">
    <property name="text">
     <string>Медиа поиск</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="mViewBD">
    <property name="text">
     <string>Поиск в базе данных</string>
    </property>
   </action>
-  <action name="action_7">
+  <action name="mPoiskZameni">
    <property name="text">
     <string>Поиск замены на КонтинентСвободы.рф</string>
    </property>
   </action>
-  <action name="action_8">
+  <action name="mAbout">
    <property name="text">
     <string>О программе</string>
    </property>
   </action>
-  <action name="action_9">
+  <action name="mSpravka">
    <property name="text">
     <string>Справка</string>
    </property>
@@ -169,12 +169,12 @@
     <string>Служба поддержки</string>
    </property>
   </action>
-  <action name="action_12">
+  <action name="mUpdateBase">
    <property name="text">
     <string>Обновить базу данных</string>
    </property>
   </action>
-  <action name="action_13">
+  <action name="mUpdateProg">
    <property name="text">
     <string>Проверить наличие новой версии</string>
    </property>
