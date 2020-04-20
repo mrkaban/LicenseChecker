@@ -140,9 +140,11 @@ def get_windows_product_key_from_wmi():
 def sled_activation():
     dir = 'C:\\Windows\\'
     spisok=[]
+    if os.path.exists('C:\\ProgramData\\KMSAutoS\\'):
+        spisok.append('C:\\ProgramData\\KMSAutoS\\')
     for root, dirs, files in os.walk(dir):
         for subdir in dirs:
-            pattern=r'Активатор|Activator|активатор|kms|AAct_Tools|ConsoleAct'
+            pattern=r'Активатор|Activator|активатор|AAct_Tools|ConsoleAct|KMSAutoS|AutoKMS'
             search_exemple = re.search(pattern, subdir, re.M|re.I)
             if search_exemple:
                 s1 = root+'\\'+subdir+'\\'
