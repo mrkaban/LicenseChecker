@@ -361,40 +361,37 @@ def UpdateBase():
                 f = open("data\\Lpro.db", "wb")
                 f.write(bd1)
                 f.close()
-                #синхронизируем пользовательскую базу данных
-                sinh = False
-                try:
-                    BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
-                    BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
-                    CurUserSinh = BaseUserSinh.cursor()
-                    s = 'SELECT * FROM UserProgram'
-                    CurUserSinh.execute(s)
-                    records = CurUserSinh.fetchall()
-                    zapis_v_lpro = []
-                    r = 20000
-                    for row in records:
-                        f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
-                        zapis_v_lpro.append(f)
-                        r = r + 1
-                    CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
-                    BaseUpdateBase.commit()
-                    sinh = True
-                except:
-                    QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
-базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
-                    sinh = False
-                if sinh == False:
-                    txt1 = "База данных успешно обновлена до версии " + h + "!"
-                else:
-                    txt1 = "База данных успешно обновлена до версии " + h + "!" + "Пользовательская база данных успешно\
-синхронизиррована с основной базой."
-                QMessageBox.about(win, "База обновлена", txt1)
+                QMessageBox.about(win, "База обновлена", "База данных успешно обновлена до версии ")
             except:
                 QMessageBox.critical(win, "Не удалось загрузить БД", "Не удалось загрузить базу данных.")
                 break
+            #синхронизируем пользовательскую базу данных
+            sinh = False
+            try:
+                BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
+                BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
+                CurUserSinh = BaseUserSinh.cursor()
+                s = 'SELECT * FROM UserProgram'
+                CurUserSinh.execute(s)
+                records = CurUserSinh.fetchall()
+                zapis_v_lpro = []
+                r = 20000
+                for row in records:
+                    f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
+                    zapis_v_lpro.append(f)
+                    r = r + 1
+                CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
+                BaseUpdateBase.commit()
+                sinh = True
+            except:
+                QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
+базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+                sinh = False
+            if sinh == True:
+                QMessageBox.about(win, "Синхронизация успешно завершена", "Пользовательская база данных успешно\
+синхронизиррована с основной базой.")
         else:
             QMessageBox.about(win, "База данных актуальна", "Обновление базы данных не требуется.")
-
     CurUpdateBase.close() #Закрываю соединение с базой и с курсором для базы
     BaseUpdateBase.close()
 win.mUpdateBase.triggered.connect(UpdateBase)
@@ -532,9 +529,9 @@ def RuchPoisk():
         except IndexError:
             if not(os.path.exists(winRuchPoisk.leKatalog.text())):
                 return
-        if not(os.path.exists(winRuchPoisk.leKatalog.text())):
-            if not(os.path.exists(winRuchPoisk.leKatalog.text())):
-                return
+        #if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+        #    if not(os.path.exists(winRuchPoisk.leKatalog.text())):
+        #        return
         if winRuchPoisk.rb1kat.isChecked():
             try:
                 dir = dirlist[0]
@@ -722,9 +719,15 @@ def MediaPoisk():
             if katalog == None:
                 return
         except IndexError:
-            return
+            if (winMediaPoisk.leKatalog.text() == None or winMediaPoisk.leKatalog.text() == ''):
+                return
+            else:
+                katalog = winMediaPoisk.leKatalog.text()
         except NameError:
-            return
+            if (winMediaPoisk.leKatalog.text() == None or winMediaPoisk.leKatalog.text() == ''):
+                return
+            else:
+                katalog = winMediaPoisk.leKatalog.text()
         winMediaPoisk.tableWidgetMedia.clear()
         spisok=[]
         slovar={}
