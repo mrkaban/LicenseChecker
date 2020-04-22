@@ -16,6 +16,11 @@ import os #Для поиска файлов
 from SearchKey import * #Поиск слов купить и т.п. в папке с программой
 from poisklicsogl import *
 import urllib.request #для проверки наличия новых версий
+from PyQt5.QtWidgets import QStyledItemDelegate #Для окрашивания строк
+from PyQt5.QtGui import QColor, QPalette #Для окрашивания строк
+import configparser #для создания настроек
+
+
 
 app = QtWidgets.QApplication([])
 win = uic.loadUi("main.ui") #графика главного окна
@@ -27,7 +32,23 @@ winViewBD = uic.loadUi("ViewBD.ui") #графика поиск в базе
 winAbout = uic.loadUi("About.ui") #графика О программе
 winRuchPoisk = uic.loadUi("RuchPoisk.ui") #графика Ручной поиск
 winMediaPoisk = uic.loadUi("Media.ui") #графика медиа поиск
+winSettings = uic.loadUi("settings.ui") #графика медиа поиск
 
+config = configparser.ConfigParser()
+path = "settings.ini"
+config.read(path)
+try:
+    synhTest = config.get("Settings", "synh")
+except:
+    QMessageBox.critical(win, "Отсутствует файл настроек", "Не удалось получить доступ к файлу settings.ini \
+в папке с программой. Настройки будут перезаписаны на значения по умолчанию.")
+    config.add_section("Settings")
+    config.set("Settings", "synh", "off")
+    config.set("Settings", "color_Avto_Text", "on")
+    with open(path, "w") as config_file:
+        config.write(config_file)
+#synh = config.get("Settings", "synh")
+#color_Avto_Text = config.get("Settings", "color_Avto_Text")
 
 def Avtopoisk(self=None):
     """Автоматический поиск при запуске программы"""
@@ -255,7 +276,8 @@ def Avtopoisk(self=None):
             f.close()
             QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         except:
-            QMessageBox.about(self, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
+            QMessageBox.critical(win, "Не удалось сохранить файл:", "Не удалось сохранить файл отчета.")
+            #QMessageBox.about(self, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
     #Добавляем действия к пунктам меню
     win.mSaveAvto.triggered.connect(SaveAvto)
     win.tableWidget.doubleClicked.connect(DoubleClic)
@@ -280,6 +302,25 @@ def Avtopoisk(self=None):
     win.tableWidget.resizeColumnsToContents()
     win.tableWidget.setColumnWidth(1, 150)
     win.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+    #Меня цвет строк
+    class ColorDelegate(QStyledItemDelegate):
+        def paint(self, painter, option, index):
+            if index.data() == 'Свободная программа':
+                for j in range(win.tableWidget.columnCount()):
+                    win.tableWidget.item(index.row(), j).setForeground(QColor("green"))
+            elif index.data() == 'Платное ПО':
+                for j in range(win.tableWidget.columnCount()):
+                    win.tableWidget.item(index.row(), j).setForeground(QColor("red"))
+            elif index.data() == 'Условно-бесплатное ПО':
+                for j in range(win.tableWidget.columnCount()):
+                    win.tableWidget.item(index.row(), j).setForeground(QColor(192, 162, 17))
+            QStyledItemDelegate.paint(self, painter, option, index)
+
+    color_Avto_Text = config.get("Settings", "color_Avto_Text")
+    if color_Avto_Text == 'on': #Если окраска включена в настройках, тогда окрашиваем
+        win.tableWidget.setItemDelegate(ColorDelegate())
+
+
 
 #Заполняю пункты меню
 def close_win(): #Вкладка Файл \ Выход
@@ -294,6 +335,54 @@ def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
 win.mWebHelp.triggered.connect(WebHelp)
+
+def Settings():
+    """Настройки программы"""
+    synh = config.get("Settings", "synh")
+    color_Avto_Text = config.get("Settings", "color_Avto_Text")
+    if synh == 'on':
+        winSettings.rbSynhOn.setChecked(True)
+    if synh == 'off':
+        winSettings.rbSynhOff.setChecked(True)
+    if color_Avto_Text == 'on':
+        winSettings.rbColorAvtoTextOn.setChecked(True)
+    if color_Avto_Text == 'off':
+        winSettings.rbColorAvtoTextOff.setChecked(True)
+    winSettings.setFixedSize(361, 292)
+    def KnopkaOk():
+        """Кнопка Ok"""
+        if winSettings.rbSynhOn.isChecked():
+            config.set("Settings", "synh", "on") # Меняем значения из конфиг. файла.
+        else:
+            config.set("Settings", "synh", "off")
+        if winSettings.rbColorAvtoTextOn.isChecked():
+            config.set("Settings", "color_Avto_Text", "on")
+        else:
+            config.set("Settings", "color_Avto_Text", "off")
+        with open(path, "w") as config_file: # Вносим изменения в конфиг. файл.
+            config.write(config_file)
+        winSettings.close()
+    winSettings.pbOk.clicked.connect(KnopkaOk)
+    def KnopkaOtmena():
+        """Кнопка Отмена"""
+        winSettings.close()
+    winSettings.pbOtmena.clicked.connect(KnopkaOtmena)
+    def KnopkaPrimenit():
+        """Кнопка Отмена"""
+        if winSettings.rbSynhOn.isChecked():
+            config.set("Settings", "synh", "on") # Меняем значения из конфиг. файла.
+        else:
+            config.set("Settings", "synh", "off")
+        if winSettings.rbColorAvtoTextOn.isChecked():
+            config.set("Settings", "color_Avto_Text", "on")
+        else:
+            config.set("Settings", "color_Avto_Text", "off")
+        with open(path, "w") as config_file: # Вносим изменения в конфиг. файл.
+            config.write(config_file)
+    winSettings.pbPrimenit.clicked.connect(KnopkaPrimenit)
+    winSettings.show()
+win.mSettings.triggered.connect(Settings)
+
 def PoiskZamen():
     """Поиск замены на сайте КонтинентСвободы.рф"""
     winPoiskZamen.setFixedSize(587, 230)
@@ -365,30 +454,32 @@ def UpdateBase():
             except:
                 QMessageBox.critical(win, "Не удалось загрузить БД", "Не удалось загрузить базу данных.")
                 break
-            #синхронизируем пользовательскую базу данных
-            sinh = False
-            try:
-                BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
-                BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
-                CurUserSinh = BaseUserSinh.cursor()
-                s = 'SELECT * FROM UserProgram'
-                CurUserSinh.execute(s)
-                records = CurUserSinh.fetchall()
-                zapis_v_lpro = []
-                r = 20000
-                for row in records:
-                    f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
-                    zapis_v_lpro.append(f)
-                    r = r + 1
-                CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
-                BaseUpdateBase.commit()
-                sinh = True
-            except:
-                QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
-базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+            synh = config.get("Settings", "synh")
+            if synh != 'off':
+                #синхронизируем пользовательскую базу данных
                 sinh = False
-            if sinh == True:
-                QMessageBox.about(win, "Синхронизация успешно завершена", "Пользовательская база данных успешно\
+                try:
+                    BaseUserSinh = sqlite3.connect(r"data\User-DB.db", uri=True)
+                    BaseUserSinh.row_factory = sqlite3.Row #подключаем базу данных и курсор
+                    CurUserSinh = BaseUserSinh.cursor()
+                    s = 'SELECT * FROM UserProgram'
+                    CurUserSinh.execute(s)
+                    records = CurUserSinh.fetchall()
+                    zapis_v_lpro = []
+                    r = 20000
+                    for row in records:
+                        f = (r, row[0], row[1], row[2], row[3], row[4], row[5])
+                        zapis_v_lpro.append(f)
+                        r = r + 1
+                    CurUpdateBase.executemany("INSERT INTO program VALUES (?,?,?,?,?,?,?)", zapis_v_lpro)
+                    BaseUpdateBase.commit()
+                    sinh = True
+                except:
+                    QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
+базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+                    sinh = False
+                if sinh == True:
+                    QMessageBox.about(win, "Синхронизация успешно завершена", "Пользовательская база данных успешно\
 синхронизиррована с основной базой.")
         else:
             QMessageBox.about(win, "База данных актуальна", "Обновление базы данных не требуется.")

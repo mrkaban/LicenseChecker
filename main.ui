@@ -96,6 +96,7 @@
     <addaction name="mMediaPoisk"/>
     <addaction name="mViewBD"/>
     <addaction name="mPoiskZameni"/>
+    <addaction name="mSettings"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -177,6 +178,11 @@
   <action name="mUpdateProg">
    <property name="text">
     <string>Проверить наличие новой версии</string>
+   </property>
+  </action>
+  <action name="mSettings">
+   <property name="text">
+    <string>Настройки</string>
    </property>
   </action>
  </widget>
