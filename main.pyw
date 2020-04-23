@@ -582,7 +582,7 @@ def RuchPoisk():
     winRuchPoisk.setFixedSize(891, 289)
     slovarSave= {}
     size_list=[]
-    size2 = None
+    #size1 = None
     dirlist = []
     def OpenKatalog():
         """Открыть каталог"""
@@ -620,9 +620,6 @@ def RuchPoisk():
         except IndexError:
             if not(os.path.exists(winRuchPoisk.leKatalog.text())):
                 return
-        #if not(os.path.exists(winRuchPoisk.leKatalog.text())):
-        #    if not(os.path.exists(winRuchPoisk.leKatalog.text())):
-        #        return
         if winRuchPoisk.rb1kat.isChecked():
             try:
                 dir = dirlist[0]
@@ -701,12 +698,10 @@ def RuchPoisk():
                  h = h.replace("\n", "")
                  data.append((slovar[itemsoft], row[1], row[2], row[3], h))
                  size_list.append(((len(slovar[itemsoft]))*6))
-                 #print((len(slovar[itemsoft])*6), '=', slovar[itemsoft])
                  #Создаю словари внутри словаря
                  slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                  added = True
              if added == False:
-                  #i = i -1
                  #Если не найдено в поле file, тогда ищем в поле name
                  s = 'SELECT * FROM program WHERE (name LIKE "' + NamePF + '%%")'
                  CurBLproRuch.execute(s)
@@ -738,9 +733,29 @@ def RuchPoisk():
                 col += 1
 
             row += 1
+        #winRuchPoisk.tableWidgetRuch.resizeColumnsToContents()
+        #winRuchPoisk.tableWidgetRuch.setColumnWidth(1, 150)
+        #winRuchPoisk.tableWidgetRuch.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        size1 = 400
+        for itemsize in size_list:
+            if size1 <= int(itemsize):
+                size1 = int(itemsize)
+        if size1 == None:
+            size1 = 400
+        if size1 < 400:
+            size1 = 400
+        if size1 > 650:
+            size1 = 650
         winRuchPoisk.tableWidgetRuch.resizeColumnsToContents()
         winRuchPoisk.tableWidgetRuch.setColumnWidth(1, 150)
         winRuchPoisk.tableWidgetRuch.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        winRuchPoisk.resize(size1+491, 289)
+        winRuchPoisk.tableWidgetRuch.resize(size1+491, 231)
+        x = size1+491
+        y = 289
+        winRuchPoisk.move(x, y)
+        winRuchPoisk.setFixedSize(x, 289)
+        winRuchPoisk.show()
     winRuchPoisk.pbPoisk.clicked.connect(ButtonRuchPoisk)
     winRuchPoisk.leKatalog.returnPressed.connect(ButtonRuchPoisk)
     def SaveRuch():
@@ -785,13 +800,14 @@ def RuchPoisk():
         except:
             QMessageBox.about(winRuchPoisk, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
     winRuchPoisk.pbSave.clicked.connect(SaveRuch)
+    #winRuchPoisk.show()
     winRuchPoisk.show()
 win.mRuchPoisk.triggered.connect(RuchPoisk)
 def MediaPoisk():
     """Ручной поиск программ"""
-    winMediaPoisk.setFixedSize(819, 273)
+    #winMediaPoisk.setFixedSize(819, 273)
     size_list=[]
-    size2 = None
+    size1 = None
     slovarMediaSave= {}
     katalog = None
     def OpenMedKatalog():
@@ -842,7 +858,7 @@ def MediaPoisk():
                              print('Исключение при сравнении размера файлов', fullname)
                          spisok.append(name)
                          size_list.append(((len(fullname))*6))
-        i = 1
+        #i = 1
         for itemsoft in spisok:
             NameP=itemsoft
             ext = os.path.splitext(slovar[itemsoft])[1]
@@ -881,9 +897,29 @@ def MediaPoisk():
                 col += 1
 
             row += 1
+        #winMediaPoisk.tableWidgetMedia.resizeColumnsToContents()
+        #winMediaPoisk.tableWidgetMedia.setColumnWidth(1, 150)
+        #winMediaPoisk.tableWidgetMedia.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        size1 = 400
+        for itemsize in size_list:
+            if size1 <= int(itemsize):
+                size1 = int(itemsize)
+        if size1 == None:
+            size1 = 400
+        if size1 < 400:
+            size1 = 400
+        if size1 > 650:
+            size1 = 650
         winMediaPoisk.tableWidgetMedia.resizeColumnsToContents()
         winMediaPoisk.tableWidgetMedia.setColumnWidth(1, 150)
         winMediaPoisk.tableWidgetMedia.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        winMediaPoisk.resize(size1+419, 273)
+        winMediaPoisk.tableWidgetMedia.resize(size1+419, 221)
+        x = size1+419
+        y = 273
+        winMediaPoisk.move(x, y)
+        winMediaPoisk.setFixedSize(x, 273)
+        winMediaPoisk.show()
     winMediaPoisk.pbPoisk.clicked.connect(ButtonMediaPoisk)
     winMediaPoisk.leKatalog.returnPressed.connect(ButtonMediaPoisk)
     def SaveMedia():
