@@ -6,7 +6,7 @@ import sys
 excludes = ['asyncio', '', 'collections', 'concurrent', 'distutils', 'email',
 'shiboken2', 'test', 'unittest', 'libcrypto-1_1']
 
-include_files = ['data', 'About', 'main.ui', 'DoubleClick.ui', 'PoisZamen.ui', 'Spravka.ui' 'ViewBD.ui', 'RuchPoisk.ui', 'Media.ui', 'settings.ui', 'settings.ini']
+include_files = ['data']
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
@@ -36,6 +36,16 @@ setup(name='LicenseChecker',
                   ('data', ['data/gpl-2.0.rtf']),
                   ('data', ['data/python-powered.png']),
                   ('data', ['data/User-DB.db']),
+                  ('data', ['data/About.ui']),
+                  ('data', ['data/main.ui']),
+                  ('data', ['data/DoubleClick.ui']),
+                  ('data', ['data/PoisZamen.ui']),
+                  ('data', ['data/Spravka.ui']),
+                  ('data', ['data/ViewBD.ui']),
+                  ('data', ['data/RuchPoisk.ui']),
+                  ('data', ['data/Media.ui']),
+                  ('data', ['data/settings.ui']),
+                  ('data', ['data/settings.ini']),
                   ],
       options=options,
             executables = [

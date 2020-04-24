@@ -23,19 +23,19 @@ import configparser #для создания настроек
 
 
 app = QtWidgets.QApplication([])
-win = uic.loadUi("main.ui") #графика главного окна
+win = uic.loadUi("data\\main.ui") #графика главного окна
 win.setFixedSize(801, 276)
-winMore = uic.loadUi("DoubleClick.ui") #графика подробности по двойному клику в автопоиске
-winPoiskZamen = uic.loadUi("PoisZamen.ui") #графика поиск замен
-winSpravka = uic.loadUi("Spravka.ui") #графика справка
-winViewBD = uic.loadUi("ViewBD.ui") #графика поиск в базе
-winAbout = uic.loadUi("About.ui") #графика О программе
-winRuchPoisk = uic.loadUi("RuchPoisk.ui") #графика Ручной поиск
-winMediaPoisk = uic.loadUi("Media.ui") #графика медиа поиск
-winSettings = uic.loadUi("settings.ui") #графика медиа поиск
+winMore = uic.loadUi("data\\DoubleClick.ui") #графика подробности по двойному клику в автопоиске
+winPoiskZamen = uic.loadUi("data\\PoisZamen.ui") #графика поиск замен
+winSpravka = uic.loadUi("data\\Spravka.ui") #графика справка
+winViewBD = uic.loadUi("data\\ViewBD.ui") #графика поиск в базе
+winAbout = uic.loadUi("data\\About.ui") #графика О программе
+winRuchPoisk = uic.loadUi("data\\RuchPoisk.ui") #графика Ручной поиск
+winMediaPoisk = uic.loadUi("data\\Media.ui") #графика медиа поиск
+winSettings = uic.loadUi("data\\settings.ui") #графика медиа поиск
 
 config = configparser.ConfigParser()
-path = "settings.ini"
+path = "data\\settings.ini"
 config.read(path)
 try:
     synhTest = config.get("Settings", "synh")
