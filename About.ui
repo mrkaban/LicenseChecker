@@ -92,7 +92,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>../python-powered.png</pixmap>
+    <pixmap>data/python-powered.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>false</bool>
