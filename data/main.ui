@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>801</width>
+    <height>276</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>LicenseChecker - Проверка легальности установленных программ</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>LicenseChecker.ico</normaloff>LicenseChecker.ico</iconset>
+  </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>801</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAsNeeded</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+    </property>
+    <property name="horizontalScrollMode">
+     <enum>QAbstractItemView::ScrollPerItem</enum>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>false</bool>
+    </property>
+    <property name="cornerButtonEnabled">
+     <bool>true</bool>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>130</number>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>801</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="mSaveAvto"/>
+    <addaction name="separator"/>
+    <addaction name="mExit"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Поиск</string>
+    </property>
+    <addaction name="mRuchPoisk"/>
+    <addaction name="mMediaPoisk"/>
+    <addaction name="mViewBD"/>
+    <addaction name="mPoiskZameni"/>
+    <addaction name="mSettings"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="mAbout"/>
+    <addaction name="mSpravka"/>
+    <addaction name="mWebStr"/>
+    <addaction name="mWebHelp"/>
+    <addaction name="mUpdateBase"/>
+    <addaction name="mUpdateProg"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="mSaveAvto">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="mExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="mRuchPoisk">
+   <property name="text">
+    <string>Ручной поиск программ</string>
+   </property>
+  </action>
+  <action name="mMediaPoisk">
+   <property name="text">
+    <string>Медиа поиск</string>
+   </property>
+  </action>
+  <action name="mViewBD">
+   <property name="text">
+    <string>Поиск в базе данных</string>
+   </property>
+  </action>
+  <action name="mPoiskZameni">
+   <property name="text">
+    <string>Поиск замены на КонтинентСвободы.рф</string>
+   </property>
+  </action>
+  <action name="mAbout">
+   <property name="text">
+    <string>О программе</string>
+   </property>
+  </action>
+  <action name="mSpravka">
+   <property name="text">
+    <string>Справка</string>
+   </property>
+  </action>
+  <action name="mWebStr">
+   <property name="text">
+    <string>Официальный сайт</string>
+   </property>
+  </action>
+  <action name="mWebHelp">
+   <property name="text">
+    <string>Служба поддержки</string>
+   </property>
+  </action>
+  <action name="mUpdateBase">
+   <property name="text">
+    <string>Обновить базу данных</string>
+   </property>
+  </action>
+  <action name="mUpdateProg">
+   <property name="text">
+    <string>Проверить наличие новой версии</string>
+   </property>
+  </action>
+  <action name="mSettings">
+   <property name="text">
+    <string>Настройки</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
