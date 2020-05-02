@@ -82,11 +82,30 @@
   <widget class="QTableWidget" name="tableWidgetBD">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>90</x>
      <y>71</y>
-     <width>711</width>
+     <width>621</width>
      <height>201</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>60</y>
+     <width>101</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>cat-bd.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

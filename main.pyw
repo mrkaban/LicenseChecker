@@ -73,7 +73,10 @@ def Avtopoisk(self=None):
             n1.append(NameP)
         else:
             continue #иначе переходим к следующей итеоации
-        IntallPath[itemsoft['name']] = itemsoft['InstallLocation']
+        try:
+            IntallPath[NameP] = itemsoft['InstallLocation']
+        except:
+            IntallPath[itemsoft['name']] = itemsoft['InstallLocation']
         s = 'SELECT * FROM program WHERE (name LIKE "' + NameP + '%%")'
         CurBLpro.execute(s)
         records = CurBLpro.fetchall()
@@ -129,10 +132,19 @@ def Avtopoisk(self=None):
         data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
         data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
         try: #Заполняем путь из реестра
-            if os.path.exists(IntallPath[s]):
-                data.append(('Путь:', IntallPath[s]))
+            s3 = IntallPath[s]
+            search_file = re.search( r'.exe', s3, re.M|re.I)
+            if search_file:
+                s3 = s3.replace('"', '')
+                s4 = os.path.basename(s3)#получаю имя файла
+                s3 = s3.replace(s4, '') # Удаляю имя файла из пути
+            else:
+                s3 = s3.replace('"', '')
+            if os.path.exists(s3) or os.path.isfile(s3):
+                data.append(('Путь:', s3))
+            #data.append(('Путь:', IntallPath[s]))
         except KeyError: #если в реестре он не указан
-            data.append(('Стоимость:', 'Неизвестно'))
+            data.append(('Путь:', 'Неизвестно'))
         try:#Ищим основной исполняемый для подтверждения
             dir = IntallPath[s] + '\\' #IndexError:
             dir = dir.replace("/", "\\")
@@ -231,7 +243,7 @@ def Avtopoisk(self=None):
         winMore.tableWidget.resize(size1+200, 281)
         x = size1+200
         y = 281
-        winMore.move(x, y)
+        #winMore.move(x, y)
         winMore.setFixedSize(x, 281)
         CurDC.close()
         BaseDC.close()
@@ -564,10 +576,10 @@ def ViewBD():
             size1 = 300
     winViewBD.tableWidgetBD.resizeColumnsToContents()
     winViewBD.resize(size1+410, 270)
-    winViewBD.tableWidgetBD.resize(size1+410, 201)
+    winViewBD.tableWidgetBD.resize(size1+321, 201)
     x = size1+410
     y = 270
-    winViewBD.move(x, y)
+    #winViewBD.move(x, y)
     winViewBD.setFixedSize(x, 270)
     #winViewBD.setFixedSize(710, 270)
     winViewBD.show()
@@ -750,10 +762,10 @@ def RuchPoisk():
         winRuchPoisk.tableWidgetRuch.setColumnWidth(1, 150)
         winRuchPoisk.tableWidgetRuch.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         winRuchPoisk.resize(size1+491, 289)
-        winRuchPoisk.tableWidgetRuch.resize(size1+491, 231)
+        winRuchPoisk.tableWidgetRuch.resize(size1+391, 231)
         x = size1+491
         y = 289
-        winRuchPoisk.move(x, y)
+        #winRuchPoisk.move(x, y)
         winRuchPoisk.setFixedSize(x, 289)
         winRuchPoisk.show()
     winRuchPoisk.pbPoisk.clicked.connect(ButtonRuchPoisk)
@@ -914,10 +926,10 @@ def MediaPoisk():
         winMediaPoisk.tableWidgetMedia.setColumnWidth(1, 150)
         winMediaPoisk.tableWidgetMedia.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         winMediaPoisk.resize(size1+419, 273)
-        winMediaPoisk.tableWidgetMedia.resize(size1+419, 221)
+        winMediaPoisk.tableWidgetMedia.resize(size1+341, 221)
         x = size1+419
         y = 273
-        winMediaPoisk.move(x, y)
+        #winMediaPoisk.move(x, y)
         winMediaPoisk.setFixedSize(x, 273)
         winMediaPoisk.show()
     winMediaPoisk.pbPoisk.clicked.connect(ButtonMediaPoisk)

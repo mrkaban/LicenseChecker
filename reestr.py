@@ -26,8 +26,19 @@ def foo(hive, flag):
                 software['publisher'] = 'undefined'
             try:
                 software['InstallLocation'] = winreg.QueryValueEx(asubkey, "InstallLocation")[0]
-            except EnvironmentError:
-                software['InstallLocation'] = 'undefined'
+            #except EnvironmentError:
+            except:
+                try:
+                    software['InstallLocation'] = winreg.QueryValueEx(asubkey, "InstallDir")[0]
+                except:
+                    try:
+                        software['InstallLocation'] = winreg.QueryValueEx(asubkey, "DisplayIcon")[0]
+                    except:
+                        software['InstallLocation'] = 'undefined'
+            #try:
+            #    software['InstallLocation'] = winreg.QueryValueEx(asubkey, "InstallLocation")[0]
+            #except EnvironmentError:
+            #    software['InstallLocation'] = 'undefined'
             software_list.append(software)
         except EnvironmentError:
             continue

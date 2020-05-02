@@ -127,11 +127,30 @@
   <widget class="QTableWidget" name="tableWidgetMedia">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>80</x>
      <y>51</y>
-     <width>821</width>
+     <width>741</width>
      <height>221</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>80</y>
+     <width>81</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>cat-media.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

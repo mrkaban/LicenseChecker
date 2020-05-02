@@ -20,9 +20,9 @@
   <widget class="QTableWidget" name="tableWidgetRuch">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>100</x>
      <y>61</y>
-     <width>891</width>
+     <width>791</width>
      <height>231</height>
     </rect>
    </property>
@@ -142,6 +142,25 @@
    </property>
    <property name="text">
     <string>3 каталога</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>80</y>
+     <width>111</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>cat-ruch.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
