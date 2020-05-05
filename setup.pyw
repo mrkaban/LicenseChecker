@@ -4,7 +4,7 @@ from cx_Freeze import setup, Executable
 import sys
 
 excludes = ['asyncio', '', 'collections', 'concurrent', 'distutils', 'email',
-'shiboken2', 'test', 'unittest', 'libcrypto-1_1']
+'test', 'unittest', 'libcrypto-1_1']
 
 include_files = ['data']
 base = None
@@ -26,7 +26,7 @@ options = {
 
 
 setup(name='LicenseChecker',
-      version='1.2',
+      version='1.3',
       description='LicenseChecker - Проверка легальности установленных программ',
       author = 'mrkaban (КонтинентСвободы.рф)',
       data_files=[
@@ -64,4 +64,4 @@ setup(name='LicenseChecker',
 #python.exe setup.pyw bdist_msi
 #--ext-list-file=data/Lpro.db, LicenseChecker.png, LicenseChecker.ico  -icon=LicenseChecker.ico
 
-# cd /d D:\LicenseChecker\1.2
+# cd /d D:\LicenseChecker\1.3
