@@ -26,6 +26,12 @@
      <height>231</height>
     </rect>
    </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
+   <property name="wordWrap">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">

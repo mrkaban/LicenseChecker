@@ -26,13 +26,19 @@ def foo(hive, flag):
                 software['publisher'] = 'undefined'
             try:
                 software['InstallLocation'] = winreg.QueryValueEx(asubkey, "InstallLocation")[0]
+                if software['InstallLocation'] == '' or software['InstallLocation'] == None:
+                    software['InstallLocation'] = 'undefined'
             #except EnvironmentError:
             except:
                 try:
                     software['InstallLocation'] = winreg.QueryValueEx(asubkey, "InstallDir")[0]
+                    if software['InstallLocation'] == '' or software['InstallLocation'] == None:
+                        software['InstallLocation'] = 'undefined'
                 except:
                     try:
                         software['InstallLocation'] = winreg.QueryValueEx(asubkey, "DisplayIcon")[0]
+                        if software['InstallLocation'] == '' or software['InstallLocation'] == None:
+                            software['InstallLocation'] = 'undefined'
                     except:
                         software['InstallLocation'] = 'undefined'
             #try:

@@ -50,7 +50,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt;&quot;&gt;Автоматический поиск срабатывает при запуске программы. Пользователь при появлении окна видит его результаты. Все данные берутся из системного реестра Windows. Названия фильтруются от версий, так как часто разработчики названия своих программ в реестре указывают с версиями. Цены указываются примерные, поэтому могут не совпадать с реальными. При двойном клике по строке открываются подробности. В контекстном меню присутствует пункт копировать.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Автоматический поиск срабатывает при запуске программы. Пользователь при появлении окна видит его результаты. Все данные берутся из системного реестра Windows. Названия фильтруются от версий, так как часто разработчики названия своих программ в реестре указывают с версиями. Цены указываются примерные, поэтому могут не совпадать с реальными. При двойном клике по строке открываются подробности. Копировать содержимое можно при помощи сочетания клавиш CTRL + C.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -72,7 +72,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt;&quot;&gt;Ручной поиск программ в указанной директории ищет все исполняемые файлы, собирает их в один список, а далее сравнивает элементы списка с базой данных. Можно указывать отдельную папку, или весь жесткий диск. Степень обнаружения зависит от наполнения имен файл в базе или совпадением имени файла с названием программы. При поиске учитываются только exe файлы.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Ручной поиск программ в указанной директории ищет все исполняемые файлы, собирает их в один список, а далее сравнивает элементы списка с базой данных. Можно указывать отдельную папку, или весь жесткий диск. Степень обнаружения зависит от наполнения имен файл в базе или совпадением имени файла с названием программы. При поиске учитываются только exe файлы. Можно указать сразу несколько директорий для поиска. Вручную написать можно только одну директорию.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -94,7 +94,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt;&quot;&gt;Медиа поиск позволяет найти в указанной папке все изображения, аудио и видео наиболее популярных форматов (.tiff, .jpeg, .bmp, .jpe, .jpg, .png, .gif, .psd, .mpeg, .flv, .mov, .m4a, .ac3, .aac, .h264, .m4v, .mkv, .mp4, .3gp, .avi, .ogg, .vob, .wma, .mp3, .wav, .mpg, .wmv). Можно указать минимальный размер обнаруживаемых файлов. Для поиска можно указывать отдельные папки или весь диск.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Медиа поиск позволяет найти в указанной папке все изображения, аудио и видео наиболее популярных форматов (.tiff, .jpeg, .bmp, .jpe, .jpg, .png, .gif, .psd, .mpeg, .flv, .mov, .m4a, .ac3, .aac, .h264, .m4v, .mkv, .mp4, .3gp, .avi, .ogg, .vob, .wma, .mp3, .wav, .mpg, .wmv). Можно указать минимальный размер обнаруживаемых файлов. Для поиска можно указывать отдельные папки или весь диск.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -116,7 +116,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt;&quot;&gt;Поиск в базе позволяет найти в ней программу по части названия. Например, 'Архиватор WinRaR 3.53', в базе достаточно набрать 'Winrar' Сама база данных хранится в папке с программой \\data\\Lpro.db.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Поиск в базе позволяет найти в ней программу по части названия. Например, 'Архиватор WinRaR 3.53', в базе достаточно набрать 'Winrar' Сама база данных хранится в папке с программой \\data\\Lpro.db.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>

@@ -19,6 +19,7 @@ import urllib.request #для проверки наличия новых вер�
 from PyQt5.QtWidgets import QStyledItemDelegate #Для окрашивания строк
 from PyQt5.QtGui import QColor, QPalette #Для окрашивания строк
 import configparser #для создания настроек
+import parametr
 
 
 
@@ -143,6 +144,8 @@ def Avtopoisk(self=None):
             if os.path.exists(s3) or os.path.isfile(s3):
                 data.append(('Путь:', s3))
             #data.append(('Путь:', IntallPath[s]))
+            if s3 == 'undefined':
+                data.append(('Путь:', 'Неизвестно'))
         except KeyError: #если в реестре он не указан
             data.append(('Путь:', 'Неизвестно'))
         try:#Ищим основной исполняемый для подтверждения
@@ -425,7 +428,7 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.2', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    search_exemple = re.search(r'1.3', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if not search_exemple:
         try:
             QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
@@ -598,25 +601,35 @@ def RuchPoisk():
     dirlist = []
     def OpenKatalog():
         """Открыть каталог"""
+        try:
+            PredKatalog = winRuchPoisk.leKatalog.text()
+            try:
+                nachalo = PredKatalog.find(' ')
+                konets = len(PredKatalog)
+                PredKatalog.replace(PredKatalog[nachalo:konets], '')
+            except:
+                pass
+        except:
+            PredKatalog = "."
         winRuchPoisk.leKatalog.setText("")
         winRuchPoisk.tableWidgetRuch.clear()
         dirlist.clear()
         if winRuchPoisk.rb1kat.isChecked():
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0])
         if winRuchPoisk.rb2kat.isChecked():
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1])
         if winRuchPoisk.rb3kat.isChecked():
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать третий каталог для поиска остатков программ",".")
+            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать третий каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1] + ' ' + dirlist[2])
     winRuchPoisk.pbObzor.clicked.connect(OpenKatalog)
@@ -826,9 +839,13 @@ def MediaPoisk():
         """Открыть каталог"""
         global katalog
         katalog = None
+        try:
+            PredKatalog = winMediaPoisk.leKatalog.text()
+        except:
+            PredKatalog = "."
         winMediaPoisk.leKatalog.setText("")
         #winMediaPoisk.tableWidgetMedia.clear()
-        katalog = QFileDialog.getExistingDirectory(winMediaPoisk,"Указать каталог для медиа-файлов",".")
+        katalog = QFileDialog.getExistingDirectory(winMediaPoisk,"Указать каталог для медиа-файлов", PredKatalog)
         winMediaPoisk.leKatalog.setText(katalog)
     winMediaPoisk.pbObzor.clicked.connect(OpenMedKatalog)
     def ButtonMediaPoisk():
@@ -975,6 +992,22 @@ def MediaPoisk():
     winMediaPoisk.pbSave.clicked.connect(SaveMedia)
     winMediaPoisk.show()
 win.mMediaPoisk.triggered.connect(MediaPoisk)
-Avtopoisk()
-win.show()
-sys.exit(app.exec())
+
+#Пример ярлыка для запуска с параметрами:
+#D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe AutoHidden "D:\\Public\\2.html"
+#D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe AutoHidden "default"
+#D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe RuchHidden "C:\\Program Files" "D:\\Public\\3.html"
+#D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe RuchHidden "C:\\Program Files" "default"
+try:
+    if sys.argv[1] == 'AutoHidden':
+        parametr.AutoHidden()
+    elif sys.argv[1] == 'RuchHidden':
+        parametr.RuchHidden()
+    else:
+        Avtopoisk()
+        win.show()
+        sys.exit(app.exec())
+except:
+    Avtopoisk()
+    win.show()
+    sys.exit(app.exec())

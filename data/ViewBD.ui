@@ -88,6 +88,9 @@
      <height>201</height>
     </rect>
    </property>
+   <property name="sortingEnabled">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
