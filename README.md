@@ -42,3 +42,5 @@ six                    1.14.0
 urllib3                1.25.8
 wheel                  0.34.2
 WMI                    1.4.9
+
+Обратите также внимание на Wiki-страницу https://github.com/mrkaban/LicenseChecker/wiki
