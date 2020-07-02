@@ -26,6 +26,9 @@
      <height>231</height>
     </rect>
    </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+   </property>
    <property name="sortingEnabled">
     <bool>true</bool>
    </property>
@@ -98,8 +101,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>20</y>
+     <x>10</x>
+     <y>10</y>
      <width>81</width>
      <height>16</height>
     </rect>
@@ -111,8 +114,8 @@
   <widget class="QRadioButton" name="rb1kat">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>0</y>
+     <x>10</x>
+     <y>40</y>
      <width>82</width>
      <height>17</height>
     </rect>
@@ -127,8 +130,8 @@
   <widget class="QRadioButton" name="rb2kat">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>20</y>
+     <x>10</x>
+     <y>60</y>
      <width>82</width>
      <height>17</height>
     </rect>
@@ -140,8 +143,8 @@
   <widget class="QRadioButton" name="rb3kat">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>40</y>
+     <x>10</x>
+     <y>80</y>
      <width>82</width>
      <height>17</height>
     </rect>
@@ -154,7 +157,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>80</y>
+     <y>110</y>
      <width>111</width>
      <height>141</height>
     </rect>
@@ -167,6 +170,19 @@
    </property>
    <property name="scaledContents">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cbSpisokExe">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>30</y>
+     <width>151</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Список всех exe &gt; 1 МБ</string>
    </property>
   </widget>
  </widget>

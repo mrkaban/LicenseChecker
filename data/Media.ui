@@ -5,6 +5,9 @@
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,8 +26,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>20</y>
+     <x>10</x>
+     <y>0</y>
      <width>91</width>
      <height>16</height>
     </rect>
@@ -36,9 +39,9 @@
   <widget class="QLineEdit" name="leMinSize">
    <property name="geometry">
     <rect>
-     <x>160</x>
+     <x>30</x>
      <y>20</y>
-     <width>61</width>
+     <width>41</width>
      <height>20</height>
     </rect>
    </property>
@@ -52,7 +55,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>240</x>
      <y>0</y>
      <width>361</width>
      <height>16</height>
@@ -159,6 +162,64 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QLineEdit" name="leRasshirenie">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>20</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>0</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Расширения для поиска:</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cbActiveRassh">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>20</y>
+     <width>21</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>cbActiveRassh</zorder>
+  <zorder>label</zorder>
+  <zorder>leMinSize</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>leKatalog</zorder>
+  <zorder>pbObzor</zorder>
+  <zorder>pbPoisk</zorder>
+  <zorder>pbSave</zorder>
+  <zorder>tableWidgetMedia</zorder>
+  <zorder>label_4</zorder>
+  <zorder>leRasshirenie</zorder>
+  <zorder>label_5</zorder>
  </widget>
  <resources/>
  <connections/>

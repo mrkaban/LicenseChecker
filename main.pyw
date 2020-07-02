@@ -120,11 +120,17 @@ def Avtopoisk(self=None):
         CurDC.execute(zapros)
         records = CurDC.fetchall()
         spisokExe = []
+        spisokZamen = []
         for row in records:
             if row[6] == None:
                 break
             g = row[6] + '.exe'
             spisokExe.append(g)
+        for row in records:
+            if row[5] == None:
+                break
+            k = row[5]
+            spisokZamen.append(k)
         TitleWinMore = s + " - Подробности"
         winMore.setWindowTitle(TitleWinMore)
         data=[]
@@ -132,6 +138,10 @@ def Avtopoisk(self=None):
         data.append(('Тип ПО:', win.tableWidget.item(item.row(), 1).text()))
         data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
         data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
+        try:
+            data.append(('Альтернативное ПО:', spisokZamen[0]))
+        except:
+            data.append(('Альтернативное ПО:', 'Не найдено'))
         try: #Заполняем путь из реестра
             s3 = IntallPath[s]
             search_file = re.search( r'.exe', s3, re.M|re.I)
@@ -428,7 +438,8 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.3', h, re.M|re.I) # ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    search_exemple = re.search(r'1.3', h, re.M|re.I)
+    """!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!"""
     if not search_exemple:
         try:
             QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
@@ -637,7 +648,9 @@ def RuchPoisk():
         """Функция для кнопки поиск"""
         winRuchPoisk.tableWidgetRuch.clear()
         spisok=[]
+        spisokExeVseh = []
         slovar={}
+        slovarSave.clear()
         try:
             if dirlist[0] == '' or dirlist[0] == None:
                 if not(os.path.exists(winRuchPoisk.leKatalog.text())):
@@ -652,11 +665,12 @@ def RuchPoisk():
                 dir = winRuchPoisk.leKatalog.text()
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                  for name in files:
-                     if name[-4:]=='.exe':
+                     if name[-4:]=='.exe' or name[-4:]=='.msi':
                          fullname = os.path.join(root, name) # получаем полное имя файла
                          fullname = fullname.replace("/", "\\")
                          slovar[name]=fullname
                          spisok.append(name)
+                         spisokExeVseh.append({name:fullname})
         if winRuchPoisk.rb2kat.isChecked():
             try:
                 dir = dirlist[0]
@@ -665,19 +679,21 @@ def RuchPoisk():
                 return
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
-                    if name[-4:]=='.exe':
+                    if name[-4:]=='.exe' or name[-4:]=='.msi':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
                         spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[1]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
-                    if name[-4:]=='.exe':
+                    if name[-4:]=='.exe' or name[-4:]=='.msi':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
                         spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
         if winRuchPoisk.rb3kat.isChecked():
             try:
                 dir = dirlist[0]
@@ -686,39 +702,49 @@ def RuchPoisk():
                 return
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
-                    if name[-4:]=='.exe':
+                    if name[-4:]=='.exe' or name[-4:]=='.msi':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
                         spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[1]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
-                    if name[-4:]=='.exe':
+                    if name[-4:]=='.exe' or name[-4:]=='.msi':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
                         spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[2]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
-                    if name[-4:]=='.exe':
+                    if name[-4:]=='.exe' or name[-4:]=='.msi':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
                         spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
         BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
         BaseLproRuch.row_factory = sqlite3.Row #подключаем базу данных и курсор
         CurBLproRuch = BaseLproRuch.cursor()
         data = []
         added = False #Для отслеживания добавлен вариант из списка или нет
+        n2 = [] #список для исключения дублей
         for itemsoft in spisok: #В списке имена файлом с расширением exe
+             if winRuchPoisk.cbSpisokExe.isChecked():
+                 break
              NameP=itemsoft
              NamePF = NameP.replace((NameP[NameP.find('.exe'):]), '')
              s = 'SELECT * FROM program WHERE (file LIKE "' + NamePF + '")'
              CurBLproRuch.execute(s)
              records = CurBLproRuch.fetchall()
              for row in records:
+                 if row[1] not in n2: #если нет в списке n2
+                     n2.append(row[1]) #тогда добавляем его туда
+                 else:
+                     continue #иначе переходим к следующей итерации
                  h = row[4]
                  h = h.replace("\n", "")
                  data.append((slovar[itemsoft], row[1], row[2], row[3], h))
@@ -739,6 +765,20 @@ def RuchPoisk():
                      #Создаю словари внутри словаря
                      slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                      added = True
+        # spisokExeVseh.append(slovar[name])
+        if winRuchPoisk.cbSpisokExe.isChecked(): #если поставлена кнопка список exe
+            for sl1 in spisokExeVseh:
+                for keyexefile in sl1:
+                    #QMessageBox.about(winRuchPoisk, "1", spisokExeVseh)
+                    folder_size = os.path.getsize(sl1[keyexefile])
+                    folder_size = folder_size / 1024  # из байт в килобайты
+                    folder_size = folder_size / 1024 # из килобайтов в мегабайты
+                    folder_size = round(folder_size, 2)  # округляем до двух символов после точки
+                    if folder_size < 1: # если меньше мегабайта к следующему циклу
+                        continue
+                    folder_size = str(folder_size) + 'МБ'
+                    data.append((sl1[keyexefile], keyexefile, folder_size, 'Неизвестно', 'Неизвестно'))
+                    slovarSave[keyexefile] = {'Address':sl1[keyexefile], 'Name':keyexefile, 'TipPO':folder_size, 'License':'Неизвестно', 'Cena':'Неизвестно'}
         CurBLproRuch.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproRuch.close()
         winRuchPoisk.tableWidgetRuch.setRowCount(len(data))
@@ -835,6 +875,10 @@ def MediaPoisk():
     size1 = None
     slovarMediaSave= {}
     katalog = None
+    def CheckedRashir():
+        if winMediaPoisk.cbActiveRassh.isChecked():
+            winMediaPoisk.leRasshirenie.setEnabled(True)
+    winMediaPoisk.cbActiveRassh.clicked.connect(CheckedRashir)
     def OpenMedKatalog():
         """Открыть каталог"""
         global katalog
@@ -867,11 +911,20 @@ def MediaPoisk():
         winMediaPoisk.tableWidgetMedia.clear()
         spisok=[]
         slovar={}
+        slovarMediaSave.clear()
         data=[]
+        if winMediaPoisk.cbActiveRassh.isChecked():
+            SpisokFormatov = []
+            ResSerchRas = re.findall(r'\w{3}|\w{4}', winMediaPoisk.leRasshirenie.text())
+            for b1 in ResSerchRas:
+                SpisokFormatov.append('.' + b1)
+        else:
+            SpisokFormatov = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd', '.mpeg', '.flv', '.mov', '.m4a', '.ac3', '.aac',
+             '.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.ogg', '.vob', '.wma', '.mp3', '.wav', '.mpg', '.wmv']
         for root, dirs, files in os.walk(katalog):
              # пройти по директории рекурсивно
-             SpisokFormatov = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd', '.mpeg', '.flv', '.mov', '.m4a', '.ac3', '.aac',
-             '.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.ogg', '.vob', '.wma', '.mp3', '.wav', '.mpg', '.wmv']
+             #SpisokFormatov = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd', '.mpeg', '.flv', '.mov', '.m4a', '.ac3', '.aac',
+             #'.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.ogg', '.vob', '.wma', '.mp3', '.wav', '.mpg', '.wmv']
              for name in files:
                  for format in SpisokFormatov:
                      if name[-4:]==format:

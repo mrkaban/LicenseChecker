@@ -33,9 +33,11 @@ def SearchKeys(path_file=''):
 def StartSeachKey(path):
     files = glob.glob(path + "\**\*.txt", recursive=True) #txt, xml, ini, lng, lt
     files1 = glob.glob(path + "\**\*.ini", recursive=True)
-    files2 = glob.glob(path + "\**\*.xml", recursive=True)
+    files2 = glob.glob(path + "\**\*.xml", recursive=True) # js map
     files3 = glob.glob(path + "\**\*.lng", recursive=True)
     files4 = glob.glob(path + "\**\*.lt", recursive=True)
+    files5 = glob.glob(path + "\**\*.js", recursive=True)
+    files6 = glob.glob(path + "\**\*.map", recursive=True)
     d = []
     for element in files:
         if len(element) == 0:
@@ -86,6 +88,30 @@ def StartSeachKey(path):
         except TypeError:
             continue
     for element in files4:
+        if len(element) == 0:
+            continue
+        try:
+            n = SearchKeys(element)
+        except PermissionError:
+            n = None
+        try:
+            if len(n) >=1:
+                d.append(SearchKeys(element))
+        except TypeError:
+            continue
+    for element in files5:
+        if len(element) == 0:
+            continue
+        try:
+            n = SearchKeys(element)
+        except PermissionError:
+            n = None
+        try:
+            if len(n) >=1:
+                d.append(SearchKeys(element))
+        except TypeError:
+            continue
+    for element in files6:
         if len(element) == 0:
             continue
         try:
