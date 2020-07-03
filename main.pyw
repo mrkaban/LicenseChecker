@@ -438,7 +438,7 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.3', h, re.M|re.I)
+    search_exemple = re.search(r'1.4', h, re.M|re.I)
     """!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!"""
     if not search_exemple:
         try:
