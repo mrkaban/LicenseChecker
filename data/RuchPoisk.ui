@@ -101,63 +101,21 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>80</x>
      <y>10</y>
      <width>81</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Использовать:</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="rb1kat">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>82</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1 каталог</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="rb2kat">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>60</y>
-     <width>82</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>2 каталога</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="rb3kat">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>82</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>3 каталога</string>
+    <string>Опции:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>110</y>
+     <y>90</y>
      <width>111</width>
      <height>141</height>
     </rect>
@@ -172,18 +130,35 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QCheckBox" name="cbSpisokExe">
+  <widget class="QComboBox" name="cbOptions">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>40</x>
      <y>30</y>
-     <width>151</width>
-     <height>17</height>
+     <width>161</width>
+     <height>22</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Список всех exe &gt; 1 МБ</string>
-   </property>
+   <item>
+    <property name="text">
+     <string>Указать 1 каталог</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Указать 2 каталога</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Указать 3 каталога</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Список всех exe и msi файлов</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

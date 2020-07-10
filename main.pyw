@@ -20,6 +20,9 @@ from PyQt5.QtWidgets import QStyledItemDelegate #Для окрашивания �
 from PyQt5.QtGui import QColor, QPalette #Для окрашивания строк
 import configparser #для создания настроек
 import parametr
+import io
+import glob
+import platform
 
 
 
@@ -155,7 +158,21 @@ def Avtopoisk(self=None):
                 data.append(('Путь:', s3))
             #data.append(('Путь:', IntallPath[s]))
             if s3 == 'undefined':
-                data.append(('Путь:', 'Неизвестно'))
+                bit = platform.win32_is_iot()
+                try:
+                    if bit:
+                        putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
+                        for el in putishko:
+                            data.append(('Путь:', el))
+                    else:
+                        putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
+                        putishko1 = glob.glob('C:\\Program Files (x86)\\**\\'+spisokExe[0], recursive=True)
+                        for el in putishko:
+                            data.append(('Путь:', el))
+                        for el in putishko1:
+                            data.append(('Путь:', el))
+                except:
+                    data.append(('Путь:', 'Неизвестно'))
         except KeyError: #если в реестре он не указан
             data.append(('Путь:', 'Неизвестно'))
         try:#Ищим основной исполняемый для подтверждения
@@ -438,8 +455,8 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.4', h, re.M|re.I)
-    """!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!"""
+    search_exemple = re.search(r'1.5', h, re.M|re.I)
+    """!!!!!!!!!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
     if not search_exemple:
         try:
             QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
@@ -625,17 +642,21 @@ def RuchPoisk():
         winRuchPoisk.leKatalog.setText("")
         winRuchPoisk.tableWidgetRuch.clear()
         dirlist.clear()
-        if winRuchPoisk.rb1kat.isChecked():
+        opt1 = winRuchPoisk.cbOptions.currentText()
+        #if winRuchPoisk.rb1kat.isChecked():
+        if opt1 == "Указать 1 каталог" or opt1 == "Список всех exe и msi файлов":
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0])
-        if winRuchPoisk.rb2kat.isChecked():
+        #if winRuchPoisk.rb2kat.isChecked():
+        if opt1 == "Указать 2 каталога":
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1])
-        if winRuchPoisk.rb3kat.isChecked():
+        #if winRuchPoisk.rb3kat.isChecked():
+        if opt1 == "Указать 3 каталога":
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
@@ -651,6 +672,7 @@ def RuchPoisk():
         spisokExeVseh = []
         slovar={}
         slovarSave.clear()
+        opt2 = winRuchPoisk.cbOptions.currentText()
         try:
             if dirlist[0] == '' or dirlist[0] == None:
                 if not(os.path.exists(winRuchPoisk.leKatalog.text())):
@@ -658,7 +680,8 @@ def RuchPoisk():
         except IndexError:
             if not(os.path.exists(winRuchPoisk.leKatalog.text())):
                 return
-        if winRuchPoisk.rb1kat.isChecked():
+        #if winRuchPoisk.rb1kat.isChecked():
+        if opt2 == "Указать 1 каталог" or opt2 == "Список всех exe и msi файлов":
             try:
                 dir = dirlist[0]
             except:
@@ -671,7 +694,8 @@ def RuchPoisk():
                          slovar[name]=fullname
                          spisok.append(name)
                          spisokExeVseh.append({name:fullname})
-        if winRuchPoisk.rb2kat.isChecked():
+        #if winRuchPoisk.rb2kat.isChecked():
+        if opt2 == "Указать 2 каталога":
             try:
                 dir = dirlist[0]
             except:
@@ -694,7 +718,8 @@ def RuchPoisk():
                         slovar[name]=fullname
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
-        if winRuchPoisk.rb3kat.isChecked():
+        #if winRuchPoisk.rb3kat.isChecked():
+        if opt2 == "Указать 3 каталога":
             try:
                 dir = dirlist[0]
             except:
@@ -732,8 +757,10 @@ def RuchPoisk():
         data = []
         added = False #Для отслеживания добавлен вариант из списка или нет
         n2 = [] #список для исключения дублей
+        #opt2 = winRuchPoisk.cbOptions.currentText()
         for itemsoft in spisok: #В списке имена файлом с расширением exe
-             if winRuchPoisk.cbSpisokExe.isChecked():
+             #if winRuchPoisk.cbSpisokExe.isChecked():
+             if opt2 == "Список всех exe и msi файлов":
                  break
              NameP=itemsoft
              NamePF = NameP.replace((NameP[NameP.find('.exe'):]), '')
@@ -766,7 +793,8 @@ def RuchPoisk():
                      slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
                      added = True
         # spisokExeVseh.append(slovar[name])
-        if winRuchPoisk.cbSpisokExe.isChecked(): #если поставлена кнопка список exe
+        #if winRuchPoisk.cbSpisokExe.isChecked(): #если поставлена кнопка список exe
+        if opt2 == "Список всех exe и msi файлов":
             for sl1 in spisokExeVseh:
                 for keyexefile in sl1:
                     #QMessageBox.about(winRuchPoisk, "1", spisokExeVseh)

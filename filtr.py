@@ -3,9 +3,16 @@
 
 def filter(NameProg):
     edited_NameProg = NameProg
+    sl = ''
+    for u in edited_NameProg:
+        if u != '"':
+            sl = sl + u
+        else:
+            continue
+    edited_NameProg = sl
 
-    if NameProg.find("\"", 0, len(NameProg)) >= 1: #Только отдельно, удаление кавычек
-         edited_NameProg = NameProg.replace("\"", '')
+    #if edited_NameProg.find("\"", 0, len(edited_NameProg)) >= 1: #Только отдельно,удаление кавычек
+      #   edited_NameProg = edited_NameProg.replace("\"", '')
 
     spisok = (" CC", " CS", " cc", " cs", " CC 2015", " CC 2016", " CC 2017", " CC 2018", " CC 2019", " CC 2020", " CC 2021", " CC 2022",
     " 2015.1", " 2015.2", " 2015.3", " 2015.4", " 2015.5", " 2016.1", " 2016.2", " 2016.3", " 2016.4", " 2016.5", " 2017.1", " 2017.2",
