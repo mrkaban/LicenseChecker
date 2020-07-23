@@ -37,7 +37,7 @@
     </font>
    </property>
    <property name="text">
-    <string>LicenseChecker 1.5</string>
+    <string>LicenseChecker 1.6</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
