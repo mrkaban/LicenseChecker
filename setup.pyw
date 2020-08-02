@@ -51,6 +51,7 @@ setup(name='LicenseChecker',
                   ('data', ['data/cat-media.png']),
                   ('data', ['data/cat-ruch.png']),
                   ('data', ['data/cat-zamena.png']),
+                  ('data', ['data/donate.png']),
                   ],
       options=options,
             executables = [
