@@ -27,8 +27,40 @@ import platform
 
 
 app = QtWidgets.QApplication([])
-win = uic.loadUi("data\\main.ui") #графика главного окна
-win.setFixedSize(801, 276)
+#пробую сделать графику основного окна в виде класса
+class UI(QMainWindow):
+    def __init__(self):
+        super(UI, self).__init__()
+        uic.loadUi("data\\main.ui", self)
+        self.setupUi(self)
+        self.w = self.size().width()     # "определение ширины"
+        self.h = self.size().height()    # "определение высоты"
+    def resizeEvent(self, event):        
+        width =  self.size().width()    
+        height = self.size().height()   
+        
+        koefW = width / self.w 
+        koefH = height / self.h 
+
+        self.tableWidget.setGeometry(90 * koefW, 0 * koefH, 831 * koefW, 291 * koefH)
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(921, 336)
+        self.tableWidget.setGeometry(QRect(90, 0, 831, 291))
+
+        self.retranslateUi(Form)
+        QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QCoreApplication.translate
+ 
+win = UI()
+
+# изначально стиль брал только из файла, но из-за авторазмера окна закрыл
+#win = uic.loadUi("data\\main.ui") #графика главного окна
+#win.setFixedSize(801, 276) Это запрещает изменять размер основного окна
+
+
 winMore = uic.loadUi("data\\DoubleClick.ui") #графика подробности по двойному клику в автопоиске
 winPoiskZamen = uic.loadUi("data\\PoisZamen.ui") #графика поиск замен
 winSpravka = uic.loadUi("data\\Spravka.ui") #графика справка
@@ -51,8 +83,6 @@ except:
     config.set("Settings", "color_Avto_Text", "on")
     with open(path, "w") as config_file:
         config.write(config_file)
-#synh = config.get("Settings", "synh")
-#color_Avto_Text = config.get("Settings", "color_Avto_Text")
 
 def Avtopoisk(self=None):
     """Автоматический поиск при запуске программы"""
@@ -61,7 +91,7 @@ def Avtopoisk(self=None):
     #Добавляю ОС и стоимость
     name_os, cena_os = DetectOS()
     data = []
-    data.append((name_os, 'Платное ПО', 'Shareware', cena_os))
+    data.append((name_os, 'Платное ПО', 'Shareware', cena_os, '-'))
     slovarSave = {}#Словарь для сохранения результатов поиска в HTML
     #Пробую работать с SQLite
     BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
@@ -89,14 +119,14 @@ def Avtopoisk(self=None):
             #tree.insert("" , i-1, text=i, values=(NameP, row[2], row[3], row[4]))
             h = row[4]
             h = h.replace("\n", "")
-            data.append((NameP, row[2], row[3], h))
-            slovarSave[NameP] = {'Name':NameP, 'TipPO':row[2], 'License':row[3], 'Cena':h}
+            data.append((NameP, row[2], row[3], h, row[5]))
+            slovarSave[NameP] = {'Name':NameP, 'TipPO':row[2], 'License':row[3], 'Cena':h, 'Zamena':row[5]}
             added = True
             break
         if added == False:
             #tree.insert("" , i-1, text=i, values=(itemsoft['name'], "Неизвестно", "Неизвестно", "???"))
-            data.append((itemsoft['name'], "Неизвестно", "Неизвестно", "???"))
-            slovarSave[NameP] = {'Name':NameP, 'TipPO':"Неизвестно", 'License':"Неизвестно", 'Cena':"???"}
+            data.append((itemsoft['name'], "Неизвестно", "Неизвестно", "???", "-"))
+            slovarSave[NameP] = {'Name':NameP, 'TipPO':"Неизвестно", 'License':"Неизвестно", 'Cena':"???", 'Zamena':"-"}
         i += 1
     CurBLpro.close()
     BaseLpro.close()
@@ -294,14 +324,16 @@ def Avtopoisk(self=None):
         <td> Тип ПО
         <td> Лицензия
         <td> Стоимость
+        <td> Замена
         </tr>
         """
         s=''
         s1=''
-        for itemsoft in slovarSave:
+        for itemsoft in slovarSave: # Zamena
             s = slovarSave[itemsoft]
             s1 = '<tr><td> ' + s['Name'] + '\n' + '<td> ' + s['TipPO'] + '\n'
             s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + s['Cena'] + '\n'
+            s1 = s1 + '<td> ' + s['Zamena'] + '\n'
             SbHTML = SbHTML + s1
         s2 = """
         </table>
@@ -323,11 +355,13 @@ def Avtopoisk(self=None):
     #Добавляем действия к пунктам меню
     win.mSaveAvto.triggered.connect(SaveAvto)
     win.tableWidget.doubleClicked.connect(DoubleClic)
-
+    
+    win.tableWidget.setGeometry(QRect(90, 0, 831, 291))
+    win.tableWidget.setGeometry(QRect(90, 0, 831, 291))
     win.tableWidget.setRowCount(len(data))
-    win.tableWidget.setColumnCount(4)
+    win.tableWidget.setColumnCount(5)
     win.tableWidget.setHorizontalHeaderLabels(
-            ('Название:', 'Тип:', 'Лицензия:', '~Цена:')
+            ('Название:', 'Тип:', 'Лицензия:', '~Цена:', 'Замена:')
         )
     row = 0
     for tup in data:
@@ -377,6 +411,11 @@ def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
     webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/issues")
 win.mWebHelp.triggered.connect(WebHelp)
+
+def Pozhertv():
+    """открытие веб-страницы для пожертвований на развитие программы"""
+    webbrowser.open_new_tab("https://money.yandex.ru/to/410011359577019")
+win.mPozhertv.triggered.connect(Pozhertv)
 
 def Settings():
     """Настройки программы"""
@@ -455,7 +494,7 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.5', h, re.M|re.I)
+    search_exemple = re.search(r'1.6', h, re.M|re.I)
     """!!!!!!!!!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
     if not search_exemple:
         try:
@@ -1079,11 +1118,16 @@ win.mMediaPoisk.triggered.connect(MediaPoisk)
 #D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe AutoHidden "default"
 #D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe RuchHidden "C:\\Program Files" "D:\\Public\\3.html"
 #D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe RuchHidden "C:\\Program Files" "default"
+# Безопасный запуск без автоматического старта автопоиска
+# D:\LicenseChecker\1.3\exe\LicenseChecker\LicenseChecker.exe SafeMode
 try:
     if sys.argv[1] == 'AutoHidden':
         parametr.AutoHidden()
     elif sys.argv[1] == 'RuchHidden':
         parametr.RuchHidden()
+    elif sys.argv[1] == 'SafeMode':
+        win.show()
+        sys.exit(app.exec())
     else:
         Avtopoisk()
         win.show()
