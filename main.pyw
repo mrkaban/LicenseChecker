@@ -34,15 +34,20 @@ class UI(QMainWindow):
         uic.loadUi("data\\main.ui", self)
         self.setupUi(self)
         self.w = self.size().width()     # "определение ширины"
-        self.h = self.size().height()    # "определение высоты"
-    def resizeEvent(self, event):        
-        width =  self.size().width()    
-        height = self.size().height()   
-        
-        koefW = width / self.w 
-        koefH = height / self.h 
+        self.h = self.size().height()   # "определение высоты"
+    def resizeEvent(self, event):
+        width =  self.size().width()
+        height = self.size().height()
 
-        self.tableWidget.setGeometry(90 * koefW, 0 * koefH, 831 * koefW, 291 * koefH)
+        koefW = width / self.w
+        koefH = height / self.h
+
+        s1 = int(90 * koefW)
+        s2 = int(0 * koefH)
+        s3 = int(831 * koefW)
+        s4 = int(291 * koefH)
+        self.tableWidget.setGeometry(s1, s2, s3, s4)
+        #self.tableWidget.setGeometry(90 * koefW, 0 * koefH, 831 * koefW, 291 * koefH)
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(921, 336)
@@ -53,7 +58,7 @@ class UI(QMainWindow):
 
     def retranslateUi(self, Form):
         _translate = QCoreApplication.translate
- 
+
 win = UI()
 
 # изначально стиль брал только из файла, но из-за авторазмера окна закрыл
@@ -355,7 +360,7 @@ def Avtopoisk(self=None):
     #Добавляем действия к пунктам меню
     win.mSaveAvto.triggered.connect(SaveAvto)
     win.tableWidget.doubleClicked.connect(DoubleClic)
-    
+
     win.tableWidget.setGeometry(QRect(90, 0, 831, 291))
     win.tableWidget.setGeometry(QRect(90, 0, 831, 291))
     win.tableWidget.setRowCount(len(data))
@@ -797,6 +802,7 @@ def RuchPoisk():
         added = False #Для отслеживания добавлен вариант из списка или нет
         n2 = [] #список для исключения дублей
         #opt2 = winRuchPoisk.cbOptions.currentText()
+        n3 = []
         for itemsoft in spisok: #В списке имена файлом с расширением exe
              #if winRuchPoisk.cbSpisokExe.isChecked():
              if opt2 == "Список всех exe и msi файлов":
@@ -813,7 +819,14 @@ def RuchPoisk():
                      continue #иначе переходим к следующей итерации
                  h = row[4]
                  h = h.replace("\n", "")
-                 data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+
+                 if slovar[itemsoft] not in n3: #Удаляю дубли
+                    data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+                    n3.append(slovar[itemsoft])
+                 else:
+                    continue #иначе переходим к следующей итеоации
+                 #data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+
                  size_list.append(((len(slovar[itemsoft]))*6))
                  #Создаю словари внутри словаря
                  slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
