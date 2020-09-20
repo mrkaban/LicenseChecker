@@ -6,6 +6,6 @@ LicenseChecker - Программа для проверки легальност
 Официальная веб-страница программы: https://континентсвободы.рф/утилиты/система/licensechecker-легальность-программ.html
 
 LicenseChecker написана при помощи интерпретатора Python 3.8.5 и следующих бибилиотек: 
-altgraph cached-property certifi cffi chardet click cx-Freeze future htmltree idna jedi numpy parso pefile Pillow pip pluggy pycparser pycryptodome PyInstaller PyQt5 PyQt5-sip pyqt5-tools PySide2 python-dotenv python-jsonrpc-server python-language-server pywin32 pywin32-ctypes requests setuptools shiboken2 six urllib3 wheel WM
+altgraph cached-property certifi cffi chardet click cx-Freeze future htmltree idna jedi numpy parso pefile Pillow pip pluggy pycparser pycryptodome PyInstaller PyQt5 PyQt5-sip pyqt5-tools PySide2 python-dotenv python-jsonrpc-server python-language-server pywin32 pywin32-ctypes requests setuptools shiboken2 six urllib3 wheel WMI
 
 Обратите также внимание на Wiki-страницу https://github.com/mrkaban/LicenseChecker/wiki
