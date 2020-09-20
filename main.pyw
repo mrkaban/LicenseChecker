@@ -1,4 +1,3 @@
-#from PyQt5 import QtWidgets, uic
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QApplication, QHeaderView, QFileDialog
 from PyQt5.QtCore import QRect, QCoreApplication, Qt, QMetaObject
@@ -178,64 +177,6 @@ def Avtopoisk(self=None):
         data.append(('Тип ПО:', win.tableWidget.item(item.row(), 1).text()))
         data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
         data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
-        try:
-            data.append(('Альтернативное ПО:', spisokZamen[0]))
-        except:
-            data.append(('Альтернативное ПО:', 'Не найдено'))
-        try: #Заполняем путь из реестра
-            s3 = IntallPath[s]
-            search_file = re.search( r'.exe', s3, re.M|re.I)
-            if search_file:
-                s3 = s3.replace('"', '')
-                s4 = os.path.basename(s3)#получаю имя файла
-                s3 = s3.replace(s4, '') # Удаляю имя файла из пути
-            else:
-                s3 = s3.replace('"', '')
-            if os.path.exists(s3) or os.path.isfile(s3):
-                data.append(('Путь:', s3))
-            #data.append(('Путь:', IntallPath[s]))
-            if s3 == 'undefined':
-                bit = platform.win32_is_iot()
-                try:
-                    if bit:
-                        putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
-                        for el in putishko:
-                            data.append(('Путь:', el))
-                    else:
-                        putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
-                        putishko1 = glob.glob('C:\\Program Files (x86)\\**\\'+spisokExe[0], recursive=True)
-                        for el in putishko:
-                            data.append(('Путь:', el))
-                        for el in putishko1:
-                            data.append(('Путь:', el))
-                except:
-                    data.append(('Путь:', 'Неизвестно'))
-        except KeyError: #если в реестре он не указан
-            data.append(('Путь:', 'Неизвестно'))
-        try:#Ищим основной исполняемый для подтверждения
-            dir = IntallPath[s] + '\\' #IndexError:
-            dir = dir.replace("/", "\\")
-            dir = dir.replace("\\\\", "\\")
-            for root1, dirs, files in os.walk(dir):
-                # пройти по директории рекурсивно
-                for name in files:
-                    if name==spisokExe[0]:
-                        fullname = os.path.join(root1, name) # получаем полное имя файла
-                        if os.path.exists(fullname):
-                            data.append(('Подтверждение:', fullname))
-        except KeyError:
-            data.append(('Подтверждение:', 'Не найдено'))
-        except IndexError:
-            data.append(('Подтверждение:', 'Не найдено'))
-        try:#поиск слов купить, как доп вариант опознавания платных программ
-            if (len(IntallPath[s]))>2:
-                h=StartSeachKey(IntallPath[s])
-                h1 = h[0]
-                data.append(('Поиск слов "Купить":', h1['path']))
-            else:
-                data.append(('Поиск слов "Купить":', 'Не найдены'))
-        except:
-            data.append(('Поиск слов "Купить":', 'Не найдены'))
         #Поиск ключа Windows и следов активации
         search_exemple = re.search( r'Windows', s, re.M|re.I)
         if search_exemple:
@@ -252,25 +193,87 @@ def Avtopoisk(self=None):
                     data.append(('Следы активации:', sled))
                     i1 += 1
                     i2 = i1
+        if not search_exemple:
+            try:
+                data.append(('Альтернативное ПО:', spisokZamen[0]))
+            except:
+                data.append(('Альтернативное ПО:', 'Не найдено'))
+        if not search_exemple:
+            try: #Заполняем путь из реестра
+                s3 = IntallPath[s]
+                search_file = re.search( r'.exe', s3, re.M|re.I)
+                if search_file:
+                    s3 = s3.replace('"', '')
+                    s4 = os.path.basename(s3)#получаю имя файла
+                    s3 = s3.replace(s4, '') # Удаляю имя файла из пути
+                else:
+                    s3 = s3.replace('"', '')
+                if os.path.exists(s3) or os.path.isfile(s3):
+                    data.append(('Путь:', s3))
+            #data.append(('Путь:', IntallPath[s]))
+                if s3 == 'undefined':
+                    bit = platform.win32_is_iot()
+                    try:
+                        if bit:
+                            putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
+                            for el in putishko:
+                                data.append(('Путь:', el))
+                        else:
+                            putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
+                            putishko1 = glob.glob('C:\\Program Files (x86)\\**\\'+spisokExe[0], recursive=True)
+                            for el in putishko:
+                                data.append(('Путь:', el))
+                            for el in putishko1:
+                                data.append(('Путь:', el))
+                    except:
+                        data.append(('Путь:', 'Неизвестно'))
+            except KeyError: #если в реестре он не указан
+                data.append(('Путь:', 'Неизвестно'))
+            try:#Ищим основной исполняемый для подтверждения
+                dir = IntallPath[s] + '\\' #IndexError:
+                dir = dir.replace("/", "\\")
+                dir = dir.replace("\\\\", "\\")
+                for root1, dirs, files in os.walk(dir):
+                # пройти по директории рекурсивно
+                    for name in files:
+                        if name==spisokExe[0]:
+                            fullname = os.path.join(root1, name) # получаем полное имя файла
+                            if os.path.exists(fullname):
+                                data.append(('Подтверждение:', fullname))
+            except KeyError:
+                data.append(('Подтверждение:', 'Не найдено'))
+            except IndexError:
+                data.append(('Подтверждение:', 'Не найдено'))
+        if not search_exemple:
+            try:#поиск слов купить, как доп вариант опознавания платных программ
+                if (len(IntallPath[s]))>2:
+                    h=StartSeachKey(IntallPath[s])
+                    h1 = h[0]
+                    data.append(('Поиск слов "Купить":', h1['path']))
+                else:
+                    data.append(('Поиск слов "Купить":', 'Не найдены'))
+            except:
+                data.append(('Поиск слов "Купить":', 'Не найдены'))
+        if not search_exemple:
         #Поиск лицензионного соглашения
-        try:
-            if (len(IntallPath[s])) > 0:
-                spisok_lic_sogl = poisk_lic_sogl(IntallPath[s])
-                i1=1
-                i2 = 0
-                for lic_sogl in spisok_lic_sogl:
-                    if i1 <= i2:
-                        data.append(('-', lic_sogl))
-                        i1 += 1
-                        i2 += 1
-                    else:
-                        data.append(('Лицензионное соглашение:', lic_sogl))
-                        i1 += 1
-                        i2 = i1
-            else:
-                data.append(('Лицензионное соглашение:', 'Не найдено'))
-        except KeyError:
-            data.append(('Лицензионное соглашение:', 'Корневой каталог приложения не указан'))
+            try:
+                if (len(IntallPath[s])) > 0:
+                    spisok_lic_sogl = poisk_lic_sogl(IntallPath[s])
+                    i1=1
+                    i2 = 0
+                    for lic_sogl in spisok_lic_sogl:
+                        if i1 <= i2:
+                            data.append(('-', lic_sogl))
+                            i1 += 1
+                            i2 += 1
+                        else:
+                            data.append(('Лицензионное соглашение:', lic_sogl))
+                            i1 += 1
+                            i2 = i1
+                else:
+                    data.append(('Лицензионное соглашение:', 'Не найдено'))
+            except KeyError:
+                data.append(('Лицензионное соглашение:', 'Корневой каталог приложения не указан'))
 
         winMore.tableWidget.setRowCount(len(data))
         winMore.tableWidget.setColumnCount(2)
@@ -306,12 +309,12 @@ def Avtopoisk(self=None):
                     size1 = 351
             except:
                 size1 = 351
-        winMore.resize(size1+200, 281)
-        winMore.tableWidget.resize(size1+200, 281)
+        winMore.resize(size1+200, 295)
+        winMore.tableWidget.resize(size1+200, 295)
         x = size1+200
         #y = 281
         #winMore.move(x, y)
-        winMore.setFixedSize(x, 281)
+        winMore.setFixedSize(x, 295)
         CurDC.close()
         BaseDC.close()
         winMore.show()
