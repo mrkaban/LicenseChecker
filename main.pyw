@@ -1,9 +1,9 @@
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+#from PyQt5 import QtWidgets, uic
+from PyQt5 import uic
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QApplication, QHeaderView, QFileDialog
+from PyQt5.QtCore import QRect, QCoreApplication, Qt, QMetaObject
 from PyQt5.QtWidgets import QTableWidgetItem
-from CheckOS import *
+from CheckOS import DetectOS, sled_activation, get_windows_product_key_from_reg
 import sys
 from reestr import foo #функция получения данных из реестра
 import winreg #Нужна для работы со значением типа реестр
@@ -13,20 +13,22 @@ from datetime import datetime #какая дата и время
 import socket #Для получения имени компьютера
 import webbrowser #Для открытия веб-страницы
 import os #Для поиска файлов
-from SearchKey import * #Поиск слов купить и т.п. в папке с программой
-from poisklicsogl import *
+#Поиск слов купить и т.п. в папке с программой
+from SearchKey import StartSeachKey
+from poisklicsogl import poisk_lic_sogl
 import urllib.request #для проверки наличия новых версий
 from PyQt5.QtWidgets import QStyledItemDelegate #Для окрашивания строк
-from PyQt5.QtGui import QColor, QPalette #Для окрашивания строк
+from PyQt5.QtGui import QColor#, QPalette #Для окрашивания строк
 import configparser #для создания настроек
 import parametr
-import io
+#import io
+import re
 import glob
 import platform
 
 
 
-app = QtWidgets.QApplication([])
+app = QApplication([])
 #пробую сделать графику основного окна в виде класса
 class UI(QMainWindow):
     def __init__(self):
@@ -47,7 +49,6 @@ class UI(QMainWindow):
         s3 = int(831 * koefW)
         s4 = int(291 * koefH)
         self.tableWidget.setGeometry(s1, s2, s3, s4)
-        #self.tableWidget.setGeometry(90 * koefW, 0 * koefH, 831 * koefW, 291 * koefH)
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(921, 336)
@@ -96,8 +97,9 @@ def Avtopoisk(self=None):
     #Добавляю ОС и стоимость
     name_os, cena_os = DetectOS()
     data = []
-    data.append((name_os, 'Платное ПО', 'Shareware', cena_os, '-'))
     slovarSave = {}#Словарь для сохранения результатов поиска в HTML
+    data.append((name_os, 'Платное ПО', 'Shareware', cena_os, '-'))
+    slovarSave[name_os] = {'Name':name_os, 'TipPO':"Платное ПО", 'License':"Shareware", 'Cena':cena_os, 'Zamena':"-"}
     #Пробую работать с SQLite
     BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
     BaseLpro.row_factory = sqlite3.Row
@@ -307,7 +309,7 @@ def Avtopoisk(self=None):
         winMore.resize(size1+200, 281)
         winMore.tableWidget.resize(size1+200, 281)
         x = size1+200
-        y = 281
+        #y = 281
         #winMore.move(x, y)
         winMore.setFixedSize(x, 281)
         CurDC.close()
@@ -346,7 +348,7 @@ def Avtopoisk(self=None):
         </html>
         """
         SbHTML = SbHTML + s2
-        ftypes = [('HTML', '.html')] #Указываю тип расширение
+        #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
         fileName = QFileDialog.getSaveFileName(self,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
         try:
@@ -499,7 +501,7 @@ def UpdateProg():
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
         QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
         return
-    search_exemple = re.search(r'1.6', h, re.M|re.I)
+    search_exemple = re.search(r'1.7', h, re.M|re.I)
     """!!!!!!!!!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
     if not search_exemple:
         try:
@@ -578,6 +580,7 @@ def ViewBD():
     """Поиск и просмотр базы данных"""
     #if textbd == None or textbd == '': если поле пусто, завершить функцию
     #    return True
+    size2 = None
     def ViewBDDlyaKnopki(event=None):
         """Функция для кнопки поиск"""
         name_user_prog =winViewBD.leKluchBD.text()
@@ -590,7 +593,8 @@ def ViewBD():
         records = CurBLproVDB.fetchall()
         size_list=[]
         dataBD = []
-        size2 = None
+        global size2
+        #size2 = None
         added = False
         i = 1
         for row in records:
@@ -601,6 +605,7 @@ def ViewBD():
             size_list.append(((len(row[1]))*6))
             added = True
             i += 1
+
             if added == False:
                 i = i -1
         CurBLproVDB.close() #Закрываю соединение с базой и с курсором для базы
@@ -636,24 +641,14 @@ def ViewBD():
 
     winViewBD.pbPoiskBD.clicked.connect(ViewBDDlyaKnopki)
     winViewBD.leKluchBD.returnPressed.connect(ViewBDDlyaKnopki)
-    try:
-        if 300<=((len(h1['path']))*6):
-            size1 = (len(h1['path']))*6 #пробую задать ширину окна по содержимому
-        else:
-            size1 = 300
-    except:
-        try:
-            if 300<=((len(h1['path']))*6):
-                size1 = (len(IntallPath[s]))*6
-            else:
-                size1 = 300
-        except:
-            size1 = 300
+    
+    if size2 == None:
+        size2 = 300
     winViewBD.tableWidgetBD.resizeColumnsToContents()
-    winViewBD.resize(size1+410, 270)
-    winViewBD.tableWidgetBD.resize(size1+321, 201)
-    x = size1+410
-    y = 270
+    winViewBD.resize(size2+410, 270)
+    winViewBD.tableWidgetBD.resize(size2+321, 201)
+    x = size2+410
+    #y = 270
     #winViewBD.move(x, y)
     winViewBD.setFixedSize(x, 270)
     #winViewBD.setFixedSize(710, 270)
@@ -688,7 +683,7 @@ def RuchPoisk():
         dirlist.clear()
         opt1 = winRuchPoisk.cbOptions.currentText()
         #if winRuchPoisk.rb1kat.isChecked():
-        if opt1 == "Указать 1 каталог" or opt1 == "Список всех exe и msi файлов":
+        if opt1 == "Указать 1 каталог" or opt1 == "Список exe, msi, rar и zip":
             d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ", PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0])
@@ -725,7 +720,7 @@ def RuchPoisk():
             if not(os.path.exists(winRuchPoisk.leKatalog.text())):
                 return
         #if winRuchPoisk.rb1kat.isChecked():
-        if opt2 == "Указать 1 каталог" or opt2 == "Список всех exe и msi файлов":
+        if opt2 == "Указать 1 каталог" or opt2 == "Список exe, msi, rar и zip":
             try:
                 dir = dirlist[0]
             except:
@@ -733,6 +728,12 @@ def RuchPoisk():
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                  for name in files:
                      if name[-4:]=='.exe' or name[-4:]=='.msi':
+                         fullname = os.path.join(root, name) # получаем полное имя файла
+                         fullname = fullname.replace("/", "\\")
+                         slovar[name]=fullname
+                         spisok.append(name)
+                         spisokExeVseh.append({name:fullname})
+                     if name[-4:]=='.rar' or name[-4:]=='.zip':
                          fullname = os.path.join(root, name) # получаем полное имя файла
                          fullname = fullname.replace("/", "\\")
                          slovar[name]=fullname
@@ -753,10 +754,22 @@ def RuchPoisk():
                         slovar[name]=fullname
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
+                    if name[-4:]=='.rar' or name[-4:]=='.zip':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[1]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
                     if name[-4:]=='.exe' or name[-4:]=='.msi':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
+                    if name[-4:]=='.rar' or name[-4:]=='.zip':
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
@@ -777,6 +790,13 @@ def RuchPoisk():
                         slovar[name]=fullname
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
+                    if name[-4:]=='.rar' or name[-4:]=='.zip':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        print(fullname)
+                        spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[1]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
@@ -786,6 +806,13 @@ def RuchPoisk():
                         slovar[name]=fullname
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
+                    if name[-4:]=='.rar' or name[-4:]=='.zip':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        print(fullname)
+                        spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
             dir = dirlist[2]
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
@@ -793,6 +820,13 @@ def RuchPoisk():
                         fullname = os.path.join(root, name) # получаем полное имя файла
                         fullname = fullname.replace("/", "\\")
                         slovar[name]=fullname
+                        spisok.append(name)
+                        spisokExeVseh.append({name:fullname})
+                    if name[-4:]=='.rar' or name[-4:]=='.zip':
+                        fullname = os.path.join(root, name) # получаем полное имя файла
+                        fullname = fullname.replace("/", "\\")
+                        slovar[name]=fullname
+                        print(fullname)
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
         BaseLproRuch = sqlite3.connect(r"data\Lpro.db", uri=True)
@@ -805,7 +839,7 @@ def RuchPoisk():
         n3 = []
         for itemsoft in spisok: #В списке имена файлом с расширением exe
              #if winRuchPoisk.cbSpisokExe.isChecked():
-             if opt2 == "Список всех exe и msi файлов":
+             if opt2 == "Список exe, msi, rar и zip":
                  break
              NameP=itemsoft
              NamePF = NameP.replace((NameP[NameP.find('.exe'):]), '')
@@ -846,7 +880,7 @@ def RuchPoisk():
                      added = True
         # spisokExeVseh.append(slovar[name])
         #if winRuchPoisk.cbSpisokExe.isChecked(): #если поставлена кнопка список exe
-        if opt2 == "Список всех exe и msi файлов":
+        if opt2 == "Список exe, msi, rar и zip":
             for sl1 in spisokExeVseh:
                 for keyexefile in sl1:
                     #QMessageBox.about(winRuchPoisk, "1", spisokExeVseh)
@@ -897,7 +931,7 @@ def RuchPoisk():
         winRuchPoisk.resize(size1+491, 289)
         winRuchPoisk.tableWidgetRuch.resize(size1+391, 231)
         x = size1+491
-        y = 289
+        #y = 289
         #winRuchPoisk.move(x, y)
         winRuchPoisk.setFixedSize(x, 289)
         winRuchPoisk.show()
@@ -934,7 +968,7 @@ def RuchPoisk():
             </html>
             """
         SbHTML = SbHTML + s2
-        ftypes = [('HTML', '.html')] #Указываю тип расширение
+        #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
         fileName = QFileDialog.getSaveFileName(winRuchPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
         try:
@@ -952,7 +986,7 @@ def MediaPoisk():
     """Ручной поиск программ"""
     #winMediaPoisk.setFixedSize(819, 273)
     size_list=[]
-    size1 = None
+    #size1 = None
     slovarMediaSave= {}
     katalog = None
     def CheckedRashir():
@@ -1022,7 +1056,7 @@ def MediaPoisk():
                          size_list.append(((len(fullname))*6))
         #i = 1
         for itemsoft in spisok:
-            NameP=itemsoft
+            #NameP=itemsoft
             ext = os.path.splitext(slovar[itemsoft])[1]
             TipFile = '?'
             SpImages = ['.tiff', '.jpeg', '.bmp', '.jpe', '.jpg', '.png', '.gif', '.psd']
@@ -1078,7 +1112,7 @@ def MediaPoisk():
         winMediaPoisk.resize(size1+419, 273)
         winMediaPoisk.tableWidgetMedia.resize(size1+341, 221)
         x = size1+419
-        y = 273
+        #y = 273
         #winMediaPoisk.move(x, y)
         winMediaPoisk.setFixedSize(x, 273)
         winMediaPoisk.show()
@@ -1112,7 +1146,7 @@ def MediaPoisk():
             </html>
             """
         SbHTML = SbHTML + s2
-        ftypes = [('HTML', '.html')] #Указываю тип расширение
+        #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
         fileMediaName = QFileDialog.getSaveFileName(winMediaPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
         try:
