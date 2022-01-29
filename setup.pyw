@@ -26,7 +26,7 @@ options = {
 
 
 setup(name='LicenseChecker',
-      version='1.7',
+      version='1.8',
       description='LicenseChecker - Проверка легальности установленных программ',
       author = 'mrkaban (КонтинентСвободы.рф)',
       data_files=[
@@ -60,8 +60,8 @@ setup(name='LicenseChecker',
             copyright ='mrkaban (КонтинентСвободы.рф)',
             base=base,
             icon="data/LicenseChecker.ico",
-            shortcutName="LicenseChecker",
-            shortcutDir='ProgramMenuFolder',
+            shortcut_name="LicenseChecker",
+            shortcut_dir='ProgramMenuFolder',
             )
         ]
       )

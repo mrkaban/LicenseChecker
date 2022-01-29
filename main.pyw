@@ -1,3 +1,4 @@
+import requests
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QApplication, QHeaderView, QFileDialog
 from PyQt5.QtCore import QRect, QCoreApplication, Qt, QMetaObject
@@ -24,7 +25,16 @@ import parametr
 import re
 import glob
 import platform
+import requests
 
+
+# Язык системы
+import locale
+try:
+    #LanguageSystem = locale.getdefaultlocale()[0]
+    LanguageSystem = 1 # ~!!!!!!!!!!!ggfg!!!!!!!!!!!!!dghgff!!!!!!!!!!!!!!!
+except:
+    LanguageSystem = 'Неизвестно'
 
 
 app = QApplication([])
@@ -32,7 +42,10 @@ app = QApplication([])
 class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
-        uic.loadUi("data\\main.ui", self)
+        if LanguageSystem == 'ru_RU':
+            uic.loadUi("data\\main.ui", self)
+        else:
+            uic.loadUi("data\\main-en.ui", self)
         self.setupUi(self)
         self.w = self.size().width()     # "определение ширины"
         self.h = self.size().height()   # "определение высоты"
@@ -65,15 +78,28 @@ win = UI()
 #win = uic.loadUi("data\\main.ui") #графика главного окна
 #win.setFixedSize(801, 276) Это запрещает изменять размер основного окна
 
-
-winMore = uic.loadUi("data\\DoubleClick.ui") #графика подробности по двойному клику в автопоиске
-winPoiskZamen = uic.loadUi("data\\PoisZamen.ui") #графика поиск замен
-winSpravka = uic.loadUi("data\\Spravka.ui") #графика справка
-winViewBD = uic.loadUi("data\\ViewBD.ui") #графика поиск в базе
-winAbout = uic.loadUi("data\\About.ui") #графика О программе
-winRuchPoisk = uic.loadUi("data\\RuchPoisk.ui") #графика Ручной поиск
-winMediaPoisk = uic.loadUi("data\\Media.ui") #графика медиа поиск
-winSettings = uic.loadUi("data\\settings.ui") #графика медиа поиск
+if LanguageSystem == 'ru_RU':
+    winMore = uic.loadUi("data\\DoubleClick.ui") #графика подробности по двойному клику в автопоиске
+    winPoiskZamen = uic.loadUi("data\\PoisZamen.ui") #графика поиск замен
+    winSpravka = uic.loadUi("data\\Spravka.ui") #графика справка
+    winViewBD = uic.loadUi("data\\ViewBD.ui") #графика поиск в базе
+    winAbout = uic.loadUi("data\\About.ui") #графика О программе
+    winRuchPoisk = uic.loadUi("data\\RuchPoisk.ui") #графика Ручной поиск
+    winMediaPoisk = uic.loadUi("data\\Media.ui") #графика медиа поиск
+    winSettings = uic.loadUi("data\\settings.ui") #графика медиа поиск
+    mesNetFailaNastroek1 = 'Отсутствует файл настроек'
+    mesNetFailaNastroek2 = 'Не удалось получить доступ к файлу settings.ini в папке с программой. Настройки будут перезаписаны на значения по умолчанию.'
+else:
+    winMore = uic.loadUi("data\\DoubleClick-en.ui") #графика подробности по двойному клику в автопоиске
+    winPoiskZamen = uic.loadUi("data\\PoisZamen-en.ui") #графика поиск замен
+    winSpravka = uic.loadUi("data\\Spravka-en.ui") #графика справка
+    winViewBD = uic.loadUi("data\\ViewBD-en.ui") #графика поиск в базе
+    winAbout = uic.loadUi("data\\About-en.ui") #графика О программе
+    winRuchPoisk = uic.loadUi("data\\RuchPoisk-en.ui") #графика Ручной поиск
+    winMediaPoisk = uic.loadUi("data\\Media-en.ui") #графика медиа поиск
+    winSettings = uic.loadUi("data\\settings-en.ui") #графика медиа поиск
+    mesNetFailaNastroek1 = 'Missing settings file'
+    mesNetFailaNastroek2 = 'Failed to access the settings.ini file in the program folder. The settings will be overwritten with the default values.'
 
 config = configparser.ConfigParser()
 path = "data\\settings.ini"
@@ -81,8 +107,7 @@ config.read(path)
 try:
     synhTest = config.get("Settings", "synh")
 except:
-    QMessageBox.critical(win, "Отсутствует файл настроек", "Не удалось получить доступ к файлу settings.ini \
-в папке с программой. Настройки будут перезаписаны на значения по умолчанию.")
+    QMessageBox.critical(win, mesNetFailaNastroek1, mesNetFailaNastroek2)
     config.add_section("Settings")
     config.set("Settings", "synh", "off")
     config.set("Settings", "color_Avto_Text", "on")
@@ -95,10 +120,20 @@ def Avtopoisk(self=None):
     software_list = foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + foo(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY)+ foo(winreg.HKEY_CURRENT_USER, 0)
     #Добавляю ОС и стоимость
     name_os, cena_os = DetectOS()
+    if LanguageSystem == 'ru_RU':
+        cena_os = str(cena_os) + ' руб'
+    else:
+        hgf = cena_os // 70
+        cena_os = '$' + str(hgf)
+    
     data = []
     slovarSave = {}#Словарь для сохранения результатов поиска в HTML
-    data.append((name_os, 'Платное ПО', 'Shareware', cena_os, '-'))
-    slovarSave[name_os] = {'Name':name_os, 'TipPO':"Платное ПО", 'License':"Shareware", 'Cena':cena_os, 'Zamena':"-"}
+    if LanguageSystem == 'ru_RU':
+        data.append((name_os, 'Платное ПО', 'Shareware', cena_os, '-'))
+        slovarSave[name_os] = {'Name':name_os, 'TipPO':"Платное ПО", 'License':"Shareware", 'Cena':cena_os, 'Zamena':"-"}
+    else:
+        data.append((name_os, 'Paid', 'Shareware', cena_os, '-'))
+        slovarSave[name_os] = {'Name':name_os, 'TipPO':"Paid", 'License':"Shareware", 'Cena':cena_os, 'Zamena':"-"}
     #Пробую работать с SQLite
     BaseLpro = sqlite3.connect(r"data\Lpro.db", uri=True)
     BaseLpro.row_factory = sqlite3.Row
@@ -107,12 +142,13 @@ def Avtopoisk(self=None):
     i = 2
     software_list = sorted(software_list, key=lambda x: x['name']) #Сортировка списка словарей в автопоиске
     n1 = [] #список для удаления дублей, в него добавляю, чтобы сравнить есть ли уже этот элемент
+    online_spisok = ''
     for itemsoft in software_list:
         NameP=filter(itemsoft['name'])
         if NameP not in n1: #Удаляю дубли
             n1.append(NameP)
         else:
-            continue #иначе переходим к следующей итеоации
+            continue #иначе переходим к следующей итерации
         try:
             IntallPath[NameP] = itemsoft['InstallLocation']
         except:
@@ -121,19 +157,80 @@ def Avtopoisk(self=None):
         CurBLpro.execute(s)
         records = CurBLpro.fetchall()
         added = False
+        tip4ikPO = ''
         for row in records:
-            #tree.insert("" , i-1, text=i, values=(NameP, row[2], row[3], row[4]))
-            h = row[4]
-            h = h.replace("\n", "")
-            data.append((NameP, row[2], row[3], h, row[5]))
-            slovarSave[NameP] = {'Name':NameP, 'TipPO':row[2], 'License':row[3], 'Cena':h, 'Zamena':row[5]}
+            if LanguageSystem == 'ru_RU':
+                # Цена
+                if '0' == row[4] or 0 == row[4]:
+                    h = 'Бесплатно'
+                else:
+                    if '~' in str(row[4]):
+                        rep = row[4]
+                        rep = rep.replace('~', '')
+                        rep = float(rep)
+                        ghj = rep * 70
+                        jkl = round(ghj, 2)
+                        h = 'от ' + str(jkl) + ' руб'
+                    else:
+                        ghj = row[4] * 70
+                        jkl = round(ghj, 2)
+                        h = str(jkl) + ' руб'
+                # Тип
+                tip4ikPO = row[2]
+            else:
+                # Цена
+                if '0' == row[4] or 0 == row[4]:
+                    #h = 'Free'
+                    h = str(row[4])
+                else:
+                    if '~' in str(row[4]):
+                        rep = str(row[4])
+                        rep = rep.replace('~', '')
+                        h = 'from $' + rep
+                    else:
+                        hgf = int(row[4])
+                        h = '$' + str(hgf)
+                # Тип
+                tip4ikPO = row[2]
+                if tip4ikPO == 'Свободная программа':
+                    tip4ikPO = 'Libre'
+                if tip4ikPO == 'Платное ПО':
+                    tip4ikPO = 'Paid'
+                if tip4ikPO == 'Условно-бесплатное ПО':
+                    tip4ikPO = 'Free'
+            data.append((NameP, tip4ikPO, row[3], h, row[5]))
+            slovarSave[NameP] = {'Name':NameP, 'TipPO':tip4ikPO, 'License':row[3], 'Cena':h, 'Zamena':row[5]}
             added = True
             break
         if added == False:
             #tree.insert("" , i-1, text=i, values=(itemsoft['name'], "Неизвестно", "Неизвестно", "???"))
-            data.append((itemsoft['name'], "Неизвестно", "Неизвестно", "???", "-"))
-            slovarSave[NameP] = {'Name':NameP, 'TipPO':"Неизвестно", 'License':"Неизвестно", 'Cena':"???", 'Zamena':"-"}
+
+            # если программа неизвестна, ищем в онлайн базе
+            #url = "https://www.mrkaban.ru/whatlic/" + NameP + "/"
+            #url.replace(' ', '@-')
+            # online_spisok = online_spisok + "::" + NameP
+            #request1 = requests.get(url, allow_redirects=False)
+            # k = request1.text
+            # k = k.replace(' января ', '.01.')
+            # g = re.search(r'([Обновлено: ]|[Опубликовано: ]|[Создано: ])+\d{2}[.]+\d{2}[.]+\d{4}', k)
+            # if g is None:
+            #     pass
+            # else:
+            #     j = g.group()
+            #     j = j.replace('.', '-')
+            if LanguageSystem == 'ru_RU':
+                data.append((itemsoft['name'], "Неизвестно", "Неизвестно", "???", "-"))
+                slovarSave[NameP] = {'Name':NameP, 'TipPO':"Неизвестно", 'License':"Неизвестно", 'Cena':"???", 'Zamena':"-"}
+            else:
+                data.append((itemsoft['name'], "Unknown", "Unknown", "???", "-"))
+                slovarSave[NameP] = {'Name':NameP, 'TipPO':"Unknown", 'License':"Unknown", 'Cena':"???", 'Zamena':"-"}
+            
         i += 1
+    # try:
+    #     url = "https://www.mrkaban.ru/whatlic/" + online_spisok + "/"
+    #     request1 = requests.get(url, allow_redirects=False)
+    # except:
+    #     print("Ошибка")
     CurBLpro.close()
     BaseLpro.close()
 
@@ -170,17 +267,50 @@ def Avtopoisk(self=None):
                 break
             k = row[5]
             spisokZamen.append(k)
-        TitleWinMore = s + " - Подробности"
-        winMore.setWindowTitle(TitleWinMore)
-        data=[]
-        data.append(('Название:', s))
-        data.append(('Тип ПО:', win.tableWidget.item(item.row(), 1).text()))
-        data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
-        data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
+        if LanguageSystem == 'ru_RU':
+            TitleWinMore = s + " - Подробности"
+            winMore.setWindowTitle(TitleWinMore)
+            data=[]
+            data.append(('Название:', s))
+            data.append(('Тип ПО:', win.tableWidget.item(item.row(), 1).text()))
+            data.append(('Лицензия:', win.tableWidget.item(item.row(), 2).text()))
+            data.append(('Стоимость:', win.tableWidget.item(item.row(), 3).text()))
+            k1 = 'Ключ Windows:'
+            k2 = 'Следы активации:'
+            k3 = 'Альтернативное ПО:'
+            k4 = 'Не найдено'
+            k5 = 'Путь:'
+            k6 = 'Неизвестно'
+            k7 = 'Подтверждение:'
+            k8 = 'Поиск слов "Купить":'
+            k9 = 'Лицензионное соглашение:'
+            k10 = 'Корневой каталог приложения не указан'
+            k11 = 'Пункт:'
+            k12 = 'Параметр:'
+        else:
+            TitleWinMore = s + " - Details"
+            winMore.setWindowTitle(TitleWinMore)
+            data=[]
+            data.append(('Name:', s))
+            data.append(('Type:', win.tableWidget.item(item.row(), 1).text()))
+            data.append(('License:', win.tableWidget.item(item.row(), 2).text()))
+            data.append(('Price:', win.tableWidget.item(item.row(), 3).text()))
+            k1 = 'Windows key:'
+            k2 = 'Activation traces:'
+            k3 = 'Alternative software:'
+            k4 = 'Not found'
+            k5 = 'Path:'
+            k6 = 'Unknown'
+            k7 = 'Confirmation:'
+            k8 = 'Search words "Buy":'
+            k9 = 'License agreement:'
+            k10 = 'Application root directory not specified'
+            k11 = 'Paragraph:'
+            k12 = 'Parameter:'
         #Поиск ключа Windows и следов активации
         search_exemple = re.search( r'Windows', s, re.M|re.I)
         if search_exemple:
-            data.append(('Ключ Windows:', get_windows_product_key_from_reg()))
+            data.append((k1, get_windows_product_key_from_reg()))
             i1 = 1
             i2 = 0
             sled_spisok = sled_activation()
@@ -190,14 +320,14 @@ def Avtopoisk(self=None):
                     i1 += 1
                     i2 += 1
                 else:
-                    data.append(('Следы активации:', sled))
+                    data.append((k2, sled))
                     i1 += 1
                     i2 = i1
         if not search_exemple:
             try:
-                data.append(('Альтернативное ПО:', spisokZamen[0]))
+                data.append((k3, spisokZamen[0]))
             except:
-                data.append(('Альтернативное ПО:', 'Не найдено'))
+                data.append((k3, k4))
         if not search_exemple:
             try: #Заполняем путь из реестра
                 s3 = IntallPath[s]
@@ -209,7 +339,7 @@ def Avtopoisk(self=None):
                 else:
                     s3 = s3.replace('"', '')
                 if os.path.exists(s3) or os.path.isfile(s3):
-                    data.append(('Путь:', s3))
+                    data.append((k5, s3))
             #data.append(('Путь:', IntallPath[s]))
                 if s3 == 'undefined':
                     bit = platform.win32_is_iot()
@@ -217,18 +347,18 @@ def Avtopoisk(self=None):
                         if bit:
                             putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
                             for el in putishko:
-                                data.append(('Путь:', el))
+                                data.append((k5, el))
                         else:
                             putishko = glob.glob('C:\\Program Files\\**\\'+spisokExe[0], recursive=True)
                             putishko1 = glob.glob('C:\\Program Files (x86)\\**\\'+spisokExe[0], recursive=True)
                             for el in putishko:
-                                data.append(('Путь:', el))
+                                data.append((k5, el))
                             for el in putishko1:
-                                data.append(('Путь:', el))
+                                data.append((k5, el))
                     except:
-                        data.append(('Путь:', 'Неизвестно'))
+                        data.append((k5, k6))
             except KeyError: #если в реестре он не указан
-                data.append(('Путь:', 'Неизвестно'))
+                data.append((k5, k6))
             try:#Ищим основной исполняемый для подтверждения
                 dir = IntallPath[s] + '\\' #IndexError:
                 dir = dir.replace("/", "\\")
@@ -239,21 +369,21 @@ def Avtopoisk(self=None):
                         if name==spisokExe[0]:
                             fullname = os.path.join(root1, name) # получаем полное имя файла
                             if os.path.exists(fullname):
-                                data.append(('Подтверждение:', fullname))
+                                data.append((k7, fullname))
             except KeyError:
-                data.append(('Подтверждение:', 'Не найдено'))
+                data.append((k7, k4))
             except IndexError:
-                data.append(('Подтверждение:', 'Не найдено'))
+                data.append((k7, k4))
         if not search_exemple:
             try:#поиск слов купить, как доп вариант опознавания платных программ
                 if (len(IntallPath[s]))>2:
                     h=StartSeachKey(IntallPath[s])
                     h1 = h[0]
-                    data.append(('Поиск слов "Купить":', h1['path']))
+                    data.append((k8, h1['path']))
                 else:
-                    data.append(('Поиск слов "Купить":', 'Не найдены'))
+                    data.append((k8, k4))
             except:
-                data.append(('Поиск слов "Купить":', 'Не найдены'))
+                data.append((k8, k4))
         if not search_exemple:
         #Поиск лицензионного соглашения
             try:
@@ -267,18 +397,18 @@ def Avtopoisk(self=None):
                             i1 += 1
                             i2 += 1
                         else:
-                            data.append(('Лицензионное соглашение:', lic_sogl))
+                            data.append((k9, lic_sogl))
                             i1 += 1
                             i2 = i1
                 else:
-                    data.append(('Лицензионное соглашение:', 'Не найдено'))
+                    data.append((k9, k4))
             except KeyError:
-                data.append(('Лицензионное соглашение:', 'Корневой каталог приложения не указан'))
+                data.append((k9, k10))
 
         winMore.tableWidget.setRowCount(len(data))
         winMore.tableWidget.setColumnCount(2)
         winMore.tableWidget.setHorizontalHeaderLabels(
-                ('Пункт:', 'Параметр:'))
+                (k11, k12))
         row = 0
         for tup in data:
             col = 0
@@ -321,46 +451,81 @@ def Avtopoisk(self=None):
 
     def SaveAvto():
         """Сохранить отчет автопоиска в HTML"""
-        SbHTML = """
-        <html>
-        <head>
-        </head>
-        <h1 align=center>Отчет автопоиска LicenseChecker</h1>"""
-        SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
-        SbHTML = SbHTML + """
-        <html>
-        <table border=1 align=center>
-        <tr><td> Название в БД
-        <td> Тип ПО
-        <td> Лицензия
-        <td> Стоимость
-        <td> Замена
-        </tr>
-        """
+        if LanguageSystem == 'ru_RU':
+            SbHTML = """
+            <html>
+            <head>
+            </head>
+            <h1 align=center>Отчет автопоиска LicenseChecker</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
+            <html>
+            <table border=1 align=center>
+            <tr><td> Название в БД
+            <td> Тип ПО
+            <td> Лицензия
+            <td> Стоимость
+            <td> Замена
+            </tr>
+            """
+        else:
+            SbHTML = """
+            <html>
+            <head>
+            </head>
+            <h1 align=center>LicenseChecker auto-search report</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>PC: '+socket.gethostname() + ' at ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
+            <html>
+            <table border=1 align=center>
+           <tr><td> Database name
+             <td> Software type
+             <td> License
+             <td> Cost
+             <td> Replacement
+            </tr>
+            """
         s=''
         s1=''
         for itemsoft in slovarSave: # Zamena
             s = slovarSave[itemsoft]
             s1 = '<tr><td> ' + s['Name'] + '\n' + '<td> ' + s['TipPO'] + '\n'
-            s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + s['Cena'] + '\n'
+            s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + str(s['Cena']) + '\n'
             s1 = s1 + '<td> ' + s['Zamena'] + '\n'
             SbHTML = SbHTML + s1
-        s2 = """
-        </table>
-        <p align=center>Официальный сайт: <a href="http://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
-        </html>
-        """
+        if LanguageSystem == 'ru_RU':    
+            s2 = """
+            </table>
+            <p align=center>Официальный сайт: <a href="https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
+            </html>
+            """
+            sk1 = 'Файл сохранен'
+            sk2 = 'Файл успешно сохранен: '
+            sk3 = 'Не удалось сохранить файл:'
+            sk4 = 'Не удалось сохранить файл отчета.'
+            sk5 = 'Укажите куда необходимо сохранить отчет?'
+        else:
+            s2 = """
+            </table>
+            <p align=center>Official site: <a href="https://openwinsoft.org/">openwinsoft.org</a></p>
+            </html>
+            """
+            sk1 = 'File saved'
+            sk2 = 'File saved successfully: '
+            sk3 = 'Failed to save file:'
+            sk4 = 'Failed to save log file.'
+            sk5 = 'Where do you want to save the report?'
         SbHTML = SbHTML + s2
         #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
-        fileName = QFileDialog.getSaveFileName(self,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
+        fileName = QFileDialog.getSaveFileName(self,sk5,".html","HTML (*.html)", options=options)
         try:
             f = open(fileName[0],'w+')
             f.write(SbHTML) #Записываем в файл
             f.close()
-            QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
+            QMessageBox.about(self, sk1, sk2 + fileName[0])
         except:
-            QMessageBox.critical(win, "Не удалось сохранить файл:", "Не удалось сохранить файл отчета.")
+            QMessageBox.critical(win, sk3, sk4)
             #QMessageBox.about(self, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
     #Добавляем действия к пунктам меню
     win.mSaveAvto.triggered.connect(SaveAvto)
@@ -370,9 +535,14 @@ def Avtopoisk(self=None):
     win.tableWidget.setGeometry(QRect(90, 0, 831, 291))
     win.tableWidget.setRowCount(len(data))
     win.tableWidget.setColumnCount(5)
-    win.tableWidget.setHorizontalHeaderLabels(
-            ('Название:', 'Тип:', 'Лицензия:', '~Цена:', 'Замена:')
-        )
+    if LanguageSystem == 'ru_RU':
+        win.tableWidget.setHorizontalHeaderLabels(
+                ('Название:', 'Тип:', 'Лицензия:', '~Цена:', 'Замена:')
+            )
+    else:
+        win.tableWidget.setHorizontalHeaderLabels(
+                ('Name:', 'Type:', 'License:', '~Price:', 'Replacement:')
+            )
     row = 0
     for tup in data:
         col = 0
@@ -389,18 +559,36 @@ def Avtopoisk(self=None):
     win.tableWidget.setColumnWidth(1, 150)
     win.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
     #Меня цвет строк
-    class ColorDelegate(QStyledItemDelegate):
-        def paint(self, painter, option, index):
-            if index.data() == 'Свободная программа':
-                for j in range(win.tableWidget.columnCount()):
-                    win.tableWidget.item(index.row(), j).setForeground(QColor("green"))
-            elif index.data() == 'Платное ПО':
-                for j in range(win.tableWidget.columnCount()):
-                    win.tableWidget.item(index.row(), j).setForeground(QColor("red"))
-            elif index.data() == 'Условно-бесплатное ПО':
-                for j in range(win.tableWidget.columnCount()):
-                    win.tableWidget.item(index.row(), j).setForeground(QColor(192, 162, 17))
-            QStyledItemDelegate.paint(self, painter, option, index)
+    if LanguageSystem == 'ru_RU':
+        class ColorDelegate(QStyledItemDelegate):
+            def paint(self, painter, option, index):
+                if index.data() == 'Свободная программа':
+                    for j in range(win.tableWidget.columnCount()):
+                        #print(index.row())
+                        win.tableWidget.item(index.row(), j).setForeground(QColor("green"))
+                elif index.data() == 'Платное ПО':
+                    for j in range(win.tableWidget.columnCount()):
+                        win.tableWidget.item(index.row(), j).setForeground(QColor("red"))
+                elif index.data() == 'Условно-бесплатное ПО':
+                    for j in range(win.tableWidget.columnCount()):
+                        win.tableWidget.item(index.row(), j).setForeground(QColor(192, 162, 17))
+                QStyledItemDelegate.paint(self, painter, option, index)
+    else:
+        class ColorDelegate(QStyledItemDelegate):
+            def paint(self, painter, option, index):
+                if index.data() == 'Libre':
+                    for j in range(win.tableWidget.columnCount()):
+                        win.tableWidget.item(index.row(), j).setForeground(QColor("green"))
+                elif index.data() == 'Free':
+                    for j in range(win.tableWidget.columnCount()):
+                        #print(index.data())
+                        win.tableWidget.item(index.row(), j).setForeground(QColor(192, 162, 17))
+                elif index.data() == 'Paid':
+                    for j in range(win.tableWidget.columnCount()):
+                        #print(index.row())
+                        win.tableWidget.item(index.row(), j).setForeground(QColor("red"))
+
+                QStyledItemDelegate.paint(self, painter, option, index)
 
     color_Avto_Text = config.get("Settings", "color_Avto_Text")
     if color_Avto_Text == 'on': #Если окраска включена в настройках, тогда окрашиваем
@@ -415,7 +603,11 @@ def close_win(): #Вкладка Файл \ Выход
 win.mExit.triggered.connect(close_win)
 def WebStr(self=None): #Вкладка ? \ Официальный сайт
     """открытие веб-страницы в браузере по умолчанию"""
-    webbrowser.open_new_tab("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/%D1%83%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B/%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0/licensechecker-%D0%BB%D0%B5%D0%B3%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC.html")
+    if LanguageSystem == 'ru_RU':
+        webstranichka = 'https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/%D1%83%D1%82%D0%B8%D0%BB%D0%B8%D1%82%D1%8B/%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0/licensechecker-%D0%BB%D0%B5%D0%B3%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC.html'
+    else:
+        webstranichka = 'https://openwinsoft.org/licensechecker/'
+    webbrowser.open_new_tab(webstranichka)
 win.mWebStr.triggered.connect(WebStr)
 def WebHelp():
     """открытие веб-страницы в браузере по умолчанию"""
@@ -484,7 +676,10 @@ def PoiskZamen():
             return True
         if textp.find(" ", 0, len(textp)) >= 1: #Только отдельно, удаление кавычек
              textp = textp.replace(" ", '+')
-        url_kluch = 'https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/component/search/?searchword='+textp
+        if LanguageSystem == 'ru_RU':
+            url_kluch = 'https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/search/?s='+textp
+        else:
+            url_kluch = 'https://openwinsoft.org/search/?s='+textp
         webbrowser.open_new_tab(url_kluch)
     winPoiskZamen.pbPosik.clicked.connect(KnopkaPoiskDliaZamen)
     winPoiskZamen.leKluch.returnPressed.connect(KnopkaPoiskDliaZamen)
@@ -502,20 +697,35 @@ def UpdateProg():
         h = str(f.read())
     except:
         #QMessageBox.about(self, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
-        QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
+        if LanguageSystem == 'ru_RU':
+            QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений.")
+        else:
+            QMessageBox.critical(win, "No connection to server", "Failed to check for updates.")
         return
-    search_exemple = re.search(r'1.7', h, re.M|re.I)
+    search_exemple = re.search(r'1.8', h, re.M|re.I)
     """!!!!!!!!!!!!!!!!ТУТ НАДО ИСПРАВИТЬ ВЕРСИЮ ПРОГРАММЫ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
     if not search_exemple:
-        try:
-            QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
-Скачайте подходящую для Вас версию. Если не получается найти файлы, нажмите на \'Assets\'.")
-            webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/releases")
-        except:
-            QMessageBox.critical(win, "Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
-            return
+        if LanguageSystem == 'ru_RU':
+            try:
+                QMessageBox.about(win, "Обнаружена новая версия", "Сейчас будет открыта веб-страница с доступными релизами.\
+    Скачайте подходящую для Вас версию. Если не получается найти файлы, нажмите на \'Assets\'.")
+                webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/releases")
+            except:
+                QMessageBox.critical(win, "Не получилось открыть страницу", "Не получилось открыть ссылку в веб-браузере.")
+                return
+        else:
+            try:
+                 QMessageBox.about(win, "New version found", "A web page with available releases will now open.\
+     Download the version that suits you. If you can't find the files, click on \'Assets\'.")
+                 webbrowser.open_new_tab("https://github.com/mrkaban/LicenseChecker/releases")
+            except:
+                 QMessageBox.critical(win, "Could not open page", "Could not open link in web browser.")
+                 return
     else:
-        QMessageBox.about(win, "Программа актуальна", "Используемая Вами версия программы актуальна.")
+        if LanguageSystem == 'ru_RU':
+            QMessageBox.about(win, "Программа актуальна", "Используемая Вами версия программы актуальна.")
+        else:
+            QMessageBox.about(win, "The program is up to date", "The version of the program you are using is up to date.")
 win.mUpdateProg.triggered.connect(UpdateProg)
 def UpdateBase():
     """Обновление базы данных Lpro.db"""
@@ -526,25 +736,56 @@ def UpdateBase():
     CurUpdateBase.execute(s1)
     records = CurUpdateBase.fetchall()
     try:
-        f = urllib.request.urlopen("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/images/lpro-base-version.txt")
+        f = urllib.request.urlopen("https://github.com/mrkaban/LicenseChecker/raw/master/lpro-base-version.txt")
         h = str(f.read())
         h = h.replace("'", "")
         h = h.replace("b", "")
     except:
-        QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений базы данных.")
+        if LanguageSystem == 'ru_RU':
+            QMessageBox.critical(win, "Нет соединения с сервером", "Не удалось проверить наличие обновлений базы данных.")
+        else:
+            QMessageBox.critical(win, "No connection to server", "Failed to check for database updates.")
         return
+    if LanguageSystem == 'ru_RU':
+        uk1 = 'База обновлена'
+        uk2 = 'База данных успешно обновлена до версии '
+        uk3 = 'Не удалось загрузить БД'
+        uk4 = 'Не удалось загрузить базу данных.'
+        uk5 = 'Не удалось синхронизировать БД'
+        uk6 = 'Не удалось синхронизировать пользовательскую\
+базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.'
+        uk7 = 'Синхронизация успешно завершена'
+        uk8 = 'Пользовательская база данных успешно синхронизиррована с основной базой.'
+        uk9 = 'База данных актуальна'
+        uk10 = 'Обновление базы данных не требуется.'
+    else:
+        uk1 = 'Database updated'
+        uk2 = 'Database upgraded successfully to '
+        uk3 = 'Failed to load database'
+        uk4 = 'Failed to load database.'
+        uk5 = 'Failed to sync database'
+        uk6 = 'Failed to sync user\
+database with main. Check for the presence of the data\\User-DB.db file in the program folder.'
+        uk7 = 'Sync completed successfully'
+        uk8 = 'The user database has been successfully synchronized with the main database.'
+        uk9 = 'Database up to date'
+        uk10 = 'No database update required.'
     for row in records:
         g = str(row[0])
         g = g.replace(" ", "")
+        try:
+            h = g.replace("\n", "")
+        except:
+            pass
         if g != h:
             try:
-                bd1 = urllib.request.urlopen("https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/images/Lpro.db").read()
+                bd1 = urllib.request.urlopen("https://github.com/mrkaban/LicenseChecker/raw/master/Lpro.db").read()
                 f = open("data\\Lpro.db", "wb")
                 f.write(bd1)
                 f.close()
-                QMessageBox.about(win, "База обновлена", "База данных успешно обновлена до версии ")
+                QMessageBox.about(win, uk1, uk2 + h)
             except:
-                QMessageBox.critical(win, "Не удалось загрузить БД", "Не удалось загрузить базу данных.")
+                QMessageBox.critical(win, uk3, uk4)
                 break
             synh = config.get("Settings", "synh")
             if synh != 'off':
@@ -567,14 +808,12 @@ def UpdateBase():
                     BaseUpdateBase.commit()
                     sinh = True
                 except:
-                    QMessageBox.critical(win, "Не удалось синхронизировать БД", "Не удалось синхронизировать пользовательскую\
-базу данных с основной. Проверьте наличие файла data\\User-DB.db в папке с программой.")
+                    QMessageBox.critical(win, uk5, uk6)
                     sinh = False
                 if sinh == True:
-                    QMessageBox.about(win, "Синхронизация успешно завершена", "Пользовательская база данных успешно\
-синхронизиррована с основной базой.")
+                    QMessageBox.about(win, uk7, uk8)
         else:
-            QMessageBox.about(win, "База данных актуальна", "Обновление базы данных не требуется.")
+            QMessageBox.about(win, uk9, uk10)
     CurUpdateBase.close() #Закрываю соединение с базой и с курсором для базы
     BaseUpdateBase.close()
 win.mUpdateBase.triggered.connect(UpdateBase)
@@ -598,13 +837,52 @@ def ViewBD():
         dataBD = []
         global size2
         #size2 = None
+        tip4ikPO = ''
         added = False
         i = 1
         for row in records:
             size2= 0
-            h = row[4]
+            if LanguageSystem == 'ru_RU':
+                # Цена
+                if '0' == row[4] or 0 == row[4]:
+                    h = 'Бесплатно'
+                else:
+                    if '~' in str(row[4]):
+                        rep = row[4]
+                        rep = rep.replace('~', '')
+                        rep = float(rep)
+                        ghj = rep * 70
+                        jkl = round(ghj, 2)
+                        h = 'от ' + str(jkl) + ' руб'
+                    else:
+                        ghj = row[4] * 70
+                        jkl = round(ghj, 2)
+                        h = str(jkl) + ' руб'
+                # Тип
+                tip4ikPO = row[2]
+            else:
+                # Цена
+                if '0' == row[4] or 0 == row[4]:
+                    h = 'Free'
+                else:
+                    if '~' in str(row[4]):
+                        rep = str(row[4])
+                        rep = rep.replace('~', '')
+                        h = 'from $' + rep
+                    else:
+                        hgf = int(row[4])
+                        h = '$' + str(hgf)
+                # Тип
+                tip4ikPO = row[2]
+                if tip4ikPO == 'Свободная программа':
+                    tip4ikPO = 'Libre'
+                if tip4ikPO == 'Платное ПО':
+                    tip4ikPO = 'Paid'
+                if tip4ikPO == 'Условно-бесплатное ПО':
+                    tip4ikPO = 'Free'
+            # h = row[4]
             h = h.replace("\n", "")
-            dataBD.append((row[1], row[2], row[3], h))
+            dataBD.append((row[1], tip4ikPO, row[3], h))
             size_list.append(((len(row[1]))*6))
             added = True
             i += 1
@@ -623,9 +901,14 @@ def ViewBD():
             size2 = 300
         winViewBD.tableWidgetBD.setRowCount(len(dataBD))
         winViewBD.tableWidgetBD.setColumnCount(4)
-        winViewBD.tableWidgetBD.setHorizontalHeaderLabels(
-                ('Название:', 'Тип:', 'Лицензия:', '~Цена:')
-            )
+        if LanguageSystem == 'ru_RU':
+            winViewBD.tableWidgetBD.setHorizontalHeaderLabels(
+                    ('Название:', 'Тип:', 'Лицензия:', '~Цена:')
+                )
+        else:
+            winViewBD.tableWidgetBD.setHorizontalHeaderLabels(
+                 ('Name:', 'Type:', 'License:', '~Price:')
+             )
         row = 0
         for tup in dataBD:
             col = 0
@@ -668,6 +951,48 @@ def RuchPoisk():
     slovarSave= {}
     size_list=[]
     #size1 = None
+    
+    if LanguageSystem == 'ru_RU':
+        msgruch1 = "Указать 1 каталог"
+        msgruch2 = "Список exe, msi, rar и zip"
+        msgruch3 = "Указать каталог для поиска остатков программ"
+        msgruch4 = "Указать 2 каталога"
+        msgruch5 = "Указать первый каталог для поиска остатков программ"
+        msgruch6 = "Указать второй каталог для поиска остатков программ"
+        msgruch7 = "Указать 3 каталога"
+        msgruch8 = "Указать первый каталог для поиска остатков программ"
+        msgruch9 = "Указать второй каталог для поиска остатков программ"
+        msgruch10 = "Указать третий каталог для поиска остатков программ"
+        msgruch11 = "Указать 1 каталог"
+        msgruch12 = "Список exe, msi, rar и zip"
+        msgruch13 = "Указать 2 каталога"
+        msgruch14 = "Ошибка"
+        msgruch15 = "Вручную можно указать только 1 каталог."
+        msgruch16 = "Указать 3 каталога"
+        msgruch17 = "Список exe, msi, rar и zip"
+        msgruch18 = "МБ"
+        msgruch19 = 'Неизвестно'
+    else:
+        msgruch1 = "Specify 1 directory"
+        msgruch2 = "List exe, msi, rar and zip"
+        msgruch3 = "Specify directory to search for program leftovers"
+        msgruch4 = "Specify 2 directories"
+        msgruch5 = "Specify the first directory to search for program leftovers"
+        msgruch6 = "Specify a second directory to search for program leftovers"
+        msgruch7 = "Specify 3 directories"
+        msgruch8 = "Specify the first directory to search for program leftovers"
+        msgruch9 = "Specify a second directory to search for program leftovers"
+        msgruch10 = "Specify a third directory to search for program leftovers"
+        msgruch11 = "Specify 1 directory"
+        msgruch12 = "List exe, msi, rar and zip"
+        msgruch13 = "Specify 2 directories"
+        msgruch14 = "Error"
+        msgruch15 = "You can only specify 1 directory manually."
+        msgruch16 = "Specify 3 directories"
+        msgruch17 = "List exe, msi, rar and zip"
+        msgruch18 = "MB"
+        msgruch19 = 'Unknown'
+    
     dirlist = []
     def OpenKatalog():
         """Открыть каталог"""
@@ -686,24 +1011,24 @@ def RuchPoisk():
         dirlist.clear()
         opt1 = winRuchPoisk.cbOptions.currentText()
         #if winRuchPoisk.rb1kat.isChecked():
-        if opt1 == "Указать 1 каталог" or opt1 == "Список exe, msi, rar и zip":
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать каталог для поиска остатков программ", PredKatalog)
+        if opt1 == msgruch1 or opt1 == msgruch2:
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch3, PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0])
         #if winRuchPoisk.rb2kat.isChecked():
-        if opt1 == "Указать 2 каталога":
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
+        if opt1 == msgruch4:
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch5, PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch6, PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1])
         #if winRuchPoisk.rb3kat.isChecked():
-        if opt1 == "Указать 3 каталога":
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать первый каталог для поиска остатков программ", PredKatalog)
+        if opt1 == msgruch7:
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch8, PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать второй каталог для поиска остатков программ", PredKatalog)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch9, PredKatalog)
             dirlist.append(d)
-            d = QFileDialog.getExistingDirectory(winRuchPoisk,"Указать третий каталог для поиска остатков программ", PredKatalog)
+            d = QFileDialog.getExistingDirectory(winRuchPoisk, msgruch10, PredKatalog)
             dirlist.append(d)
             winRuchPoisk.leKatalog.setText(dirlist[0] + ' ' + dirlist[1] + ' ' + dirlist[2])
     winRuchPoisk.pbObzor.clicked.connect(OpenKatalog)
@@ -723,7 +1048,7 @@ def RuchPoisk():
             if not(os.path.exists(winRuchPoisk.leKatalog.text())):
                 return
         #if winRuchPoisk.rb1kat.isChecked():
-        if opt2 == "Указать 1 каталог" or opt2 == "Список exe, msi, rar и zip":
+        if opt2 == msgruch11 or opt2 == msgruch12:
             try:
                 dir = dirlist[0]
             except:
@@ -743,11 +1068,11 @@ def RuchPoisk():
                          spisok.append(name)
                          spisokExeVseh.append({name:fullname})
         #if winRuchPoisk.rb2kat.isChecked():
-        if opt2 == "Указать 2 каталога":
+        if opt2 == msgruch13:
             try:
                 dir = dirlist[0]
             except:
-                QMessageBox.critical(winRuchPoisk, "Ошибка", "Вручную можно указать только 1 каталог.")
+                QMessageBox.critical(winRuchPoisk, msgruch14, msgruch15)
                 return
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
@@ -779,11 +1104,11 @@ def RuchPoisk():
                         spisok.append(name)
                         spisokExeVseh.append({name:fullname})
         #if winRuchPoisk.rb3kat.isChecked():
-        if opt2 == "Указать 3 каталога":
+        if opt2 == msgruch16:
             try:
                 dir = dirlist[0]
             except:
-                QMessageBox.critical(winRuchPoisk, "Ошибка", "Вручную можно указать только 1 каталог.")
+                QMessageBox.critical(winRuchPoisk, msgruch14, msgruch15)
                 return
             for root, dirs, files in os.walk(dir): # пройти по директории рекурсивно
                 for name in files:
@@ -842,7 +1167,7 @@ def RuchPoisk():
         n3 = []
         for itemsoft in spisok: #В списке имена файлом с расширением exe
              #if winRuchPoisk.cbSpisokExe.isChecked():
-             if opt2 == "Список exe, msi, rar и zip":
+             if opt2 == msgruch17:
                  break
              NameP=itemsoft
              NamePF = NameP.replace((NameP[NameP.find('.exe'):]), '')
@@ -854,11 +1179,50 @@ def RuchPoisk():
                      n2.append(row[1]) #тогда добавляем его туда
                  else:
                      continue #иначе переходим к следующей итерации
-                 h = row[4]
-                 h = h.replace("\n", "")
+                 #h = row[4]
+                 #h = h.replace("\n", "")
 
                  if slovar[itemsoft] not in n3: #Удаляю дубли
-                    data.append((slovar[itemsoft], row[1], row[2], row[3], h))
+                    ### Цена и тип
+                    if LanguageSystem == 'ru_RU':
+                        # Цена
+                        if '0' == row[4] or 0 == row[4]:
+                            h = 'Бесплатно'
+                        else:
+                            if '~' in str(row[4]):
+                                rep = row[4]
+                                rep = rep.replace('~', '')
+                                rep = float(rep)
+                                ghj = rep * 70
+                                jkl = round(ghj, 2)
+                                h = 'от ' + str(jkl) + ' руб'
+                            else:
+                                ghj = row[4] * 70
+                                jkl = round(ghj, 2)
+                                h = str(jkl) + ' руб'
+                        # Тип
+                        tip4ikPO = row[2]
+                    else:
+                        # Цена
+                        if '0' == row[4] or 0 == row[4]:
+                            h = 'Free'
+                        else:
+                            if '~' in str(row[4]):
+                                rep = str(row[4])
+                                rep = rep.replace('~', '')
+                                h = 'from $' + rep
+                            else:
+                                hgf = int(row[4])
+                                h = '$' + str(hgf)
+                        # Тип
+                        tip4ikPO = row[2]
+                        if tip4ikPO == 'Свободная программа':
+                            tip4ikPO = 'Libre'
+                        if tip4ikPO == 'Платное ПО':
+                            tip4ikPO = 'Paid'
+                        if tip4ikPO == 'Условно-бесплатное ПО':
+                            tip4ikPO = 'Free'
+                    data.append((slovar[itemsoft], row[1], tip4ikPO, row[3], h))
                     n3.append(slovar[itemsoft])
                  else:
                     continue #иначе переходим к следующей итеоации
@@ -866,7 +1230,7 @@ def RuchPoisk():
 
                  size_list.append(((len(slovar[itemsoft]))*6))
                  #Создаю словари внутри словаря
-                 slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':row[2], 'License':row[3], 'Cena':row[4]}
+                 slovarSave[row[1]] = {'Address':slovar[itemsoft], 'Name':row[1], 'TipPO':tip4ikPO, 'License':row[3], 'Cena':h}
                  added = True
              if added == False:
                  #Если не найдено в поле file, тогда ищем в поле name
@@ -883,7 +1247,7 @@ def RuchPoisk():
                      added = True
         # spisokExeVseh.append(slovar[name])
         #if winRuchPoisk.cbSpisokExe.isChecked(): #если поставлена кнопка список exe
-        if opt2 == "Список exe, msi, rar и zip":
+        if opt2 == msgruch17:
             for sl1 in spisokExeVseh:
                 for keyexefile in sl1:
                     #QMessageBox.about(winRuchPoisk, "1", spisokExeVseh)
@@ -893,16 +1257,21 @@ def RuchPoisk():
                     folder_size = round(folder_size, 2)  # округляем до двух символов после точки
                     if folder_size < 1: # если меньше мегабайта к следующему циклу
                         continue
-                    folder_size = str(folder_size) + 'МБ'
-                    data.append((sl1[keyexefile], keyexefile, folder_size, 'Неизвестно', 'Неизвестно'))
-                    slovarSave[keyexefile] = {'Address':sl1[keyexefile], 'Name':keyexefile, 'TipPO':folder_size, 'License':'Неизвестно', 'Cena':'Неизвестно'}
+                    folder_size = str(folder_size) + msgruch18
+                    data.append((sl1[keyexefile], keyexefile, folder_size, msgruch19, msgruch19))
+                    slovarSave[keyexefile] = {'Address':sl1[keyexefile], 'Name':keyexefile, 'TipPO':folder_size, 'License':msgruch19, 'Cena':msgruch19}
         CurBLproRuch.close() #Закрываю соединение с базой и с курсором для базы
         BaseLproRuch.close()
         winRuchPoisk.tableWidgetRuch.setRowCount(len(data))
         winRuchPoisk.tableWidgetRuch.setColumnCount(5)
-        winRuchPoisk.tableWidgetRuch.setHorizontalHeaderLabels(
-                ('Название:', "В базе:", 'Тип:', 'Лицензия:', '~Цена:')
-            )
+        if LanguageSystem == 'ru_RU':
+            winRuchPoisk.tableWidgetRuch.setHorizontalHeaderLabels(
+                    ('Название:', "В базе:", 'Тип:', 'Лицензия:', '~Цена:')
+                )
+        else:
+            winRuchPoisk.tableWidgetRuch.setHorizontalHeaderLabels(
+                     ('Name:', "In database:", 'Type:', 'License:', '~Price:')
+                 )
         row = 0
         for tup in data:
             col = 0
@@ -942,45 +1311,81 @@ def RuchPoisk():
     winRuchPoisk.leKatalog.returnPressed.connect(ButtonRuchPoisk)
     def SaveRuch():
         """Сохранить отчет в HTML"""
-        SbHTML = """
+        if LanguageSystem == 'ru_RU':
+            SbHTML = """
+                <html>
+                <head>
+                </head>
+            <h1 align=center>Отчет ручного поиска LicenseChecker</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
             <html>
-            <head>
-            </head>
-        <h1 align=center>Отчет ручного поиска LicenseChecker</h1>"""
-        SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
-        SbHTML = SbHTML + """
-        <html>
-        <table border=1 align=center>
-        <tr><td> Название в БД
-        <td> Путь
-        <td> Тип ПО
-        <td> Лицензия
-        <td> Стоимость
-        </tr>
-            """
+            <table border=1 align=center>
+            <tr><td> Название в БД
+            <td> Путь
+            <td> Тип ПО
+            <td> Лицензия
+            <td> Стоимость
+            </tr>
+                """
+        else:
+            SbHTML="""
+                 <html>
+                 <head>
+                 </head>
+             <h1 align=center>LicenseChecker manual search report</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>PC: '+socket.gethostname() + ' at ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
+             <html>
+             <table border=1 align=center>
+             <tr><td> Database name
+             <td> Path
+             <td> Type
+             <td> License
+             <td> Price
+             </tr>
+                 """
+            
         s=''
         s1=''
         for itemsoft in slovarSave:
             s = slovarSave[itemsoft]
             s1 = '<tr><td> ' + s['Name'] + '\n' + '<td> ' + s['Address'] + '\n' + '<td> ' + s['TipPO'] + '\n'
-            s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + s['Cena'] + '\n'
+            s1 = s1 + '<td> ' + s['License'] + '\n' + '<td> ' + str(s['Cena']) + '\n'
             SbHTML = SbHTML + s1
-        s2 = """
-            </table>
-            <p align=center>Официальный сайт: <a href="http://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
-            </html>
-            """
+        if LanguageSystem == 'ru_RU':
+            s2 = """
+                </table>
+                <p align=center>Официальный сайт: <a href="https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
+                </html>
+                """
+            msgruchsave1 = "Укажите куда необходимо сохранить отчет?"
+            msgruchsave2 = "Файл сохранен"
+            msgruchsave3 = "Файл успешно сохранен: "
+            msgruchsave4 = "Не удалось сохранить"
+            msgruchsave5 = "Не удалось сохранить файл: "
+        else:
+            s2="""
+                 </table>
+                 <p align=center>Official site: <a href="https://openwinsoft.org/">openwinsoft.org</a></p>
+                 </html>
+                 """
+            msgruchsave1 = "Where do you want to save the report?"
+            msgruchsave2 = "File Saved"
+            msgruchsave3 = "File saved successfully: "
+            msgruchsave4 = "Failed to save"
+            msgruchsave5 = "Failed to save file: "
         SbHTML = SbHTML + s2
         #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
-        fileName = QFileDialog.getSaveFileName(winRuchPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
+        fileName = QFileDialog.getSaveFileName(winRuchPoisk, msgruchsave1,".html","HTML (*.html)", options=options)
         try:
             f = open(fileName[0],'w+')
             f.write(SbHTML) #Записываем в файл
             f.close()
-            QMessageBox.about(winRuchPoisk, "Файл сохранен", "Файл успешно сохранен: " + fileName[0])
+            QMessageBox.about(winRuchPoisk, msgruchsave2, msgruchsave3 + fileName[0])
         except:
-            QMessageBox.about(winRuchPoisk, "Не удалось сохранить", "Не удалось сохранить файл: " + fileName[0])
+            QMessageBox.about(winRuchPoisk, msgruchsave4, msgruchsave5 + fileName[0])
     winRuchPoisk.pbSave.clicked.connect(SaveRuch)
     #winRuchPoisk.show()
     winRuchPoisk.show()
@@ -990,6 +1395,20 @@ def MediaPoisk():
     #winMediaPoisk.setFixedSize(819, 273)
     size_list=[]
     #size1 = None
+    if LanguageSystem == 'ru_RU':
+        msgmed1 = "Указать каталог для медиа-файлов"
+        msgmed2 = 'Исключение при сравнении размера файлов'
+        msgmed3 = 'Изображение'
+        msgmed4 = 'Аудио'
+        msgmed5 = 'Видео'
+        msgmed6 = ' МБ'
+    else:
+        msgmed1 = "Specify directory for media files"
+        msgmed2 = 'File size comparison exception'
+        msgmed3 = 'Image'
+        msgmed4 = 'Audio'
+        msgmed5 = 'Video'
+        msgmed6 = 'MB'
     slovarMediaSave= {}
     katalog = None
     def CheckedRashir():
@@ -1006,7 +1425,7 @@ def MediaPoisk():
             PredKatalog = "."
         winMediaPoisk.leKatalog.setText("")
         #winMediaPoisk.tableWidgetMedia.clear()
-        katalog = QFileDialog.getExistingDirectory(winMediaPoisk,"Указать каталог для медиа-файлов", PredKatalog)
+        katalog = QFileDialog.getExistingDirectory(winMediaPoisk, msgmed1, PredKatalog)
         winMediaPoisk.leKatalog.setText(katalog)
     winMediaPoisk.pbObzor.clicked.connect(OpenMedKatalog)
     def ButtonMediaPoisk():
@@ -1054,7 +1473,7 @@ def MediaPoisk():
                              if f < r:
                                  continue
                          except:
-                             print('Исключение при сравнении размера файлов', fullname)
+                             print(msgmed2, fullname)
                          spisok.append(name)
                          size_list.append(((len(fullname))*6))
         #i = 1
@@ -1067,23 +1486,28 @@ def MediaPoisk():
             SpVideo = ['.mpeg', '.flv', '.mov', '.h264', '.m4v', '.mkv', '.mp4', '.3gp', '.avi', '.vob', '.mov', '.mpg', '.wmv']
             for format in SpImages:
                 if ext==format:
-                    TipFile = 'Изображение'
+                    TipFile = msgmed3
             for format in SpAudio:
                 if ext==format:
-                    TipFile = 'Аудио'
+                    TipFile = msgmed4
             for format in SpVideo:
                 if ext==format:
-                    TipFile = 'Видео'
+                    TipFile = msgmed5
             razmerFile = os.path.getsize(slovar[itemsoft])
             razmerFile = round(((razmerFile/1024)/1024), 2)
-            razmerFileStr = str(razmerFile) + ' МБ'
+            razmerFileStr = str(razmerFile) + msgmed6
             data.append((slovar[itemsoft], TipFile, razmerFileStr))
             slovarMediaSave[slovar[itemsoft]] = {'File':slovar[itemsoft], 'Tip':TipFile, 'Size':razmerFileStr}
         winMediaPoisk.tableWidgetMedia.setRowCount(len(data))
         winMediaPoisk.tableWidgetMedia.setColumnCount(3)
-        winMediaPoisk.tableWidgetMedia.setHorizontalHeaderLabels(
-                    ("Имя файла:", "Тип:", "Размер:")
-                )
+        if LanguageSystem == 'ru_RU':
+            winMediaPoisk.tableWidgetMedia.setHorizontalHeaderLabels(
+                        ("Имя файла:", "Тип:", "Размер:")
+                    )
+        else:
+            winMediaPoisk.tableWidgetMedia.setHorizontalHeaderLabels(
+                     ("Filename:", "Type:", "Size:")
+                 )
         row = 0
         for tup in data:
             col = 0
@@ -1123,42 +1547,73 @@ def MediaPoisk():
     winMediaPoisk.leKatalog.returnPressed.connect(ButtonMediaPoisk)
     def SaveMedia():
         """Сохранить отчет в HTML"""
-        SbHTML = """
+        if LanguageSystem == 'ru_RU':
+            SbHTML = """
+                <html>
+                <head>
+                </head>
+            <h1 align=center>Отчет медиа поиска LicenseChecker</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
             <html>
-            <head>
-            </head>
-        <h1 align=center>Отчет медиа поиска LicenseChecker</h1>"""
-        SbHTML = SbHTML + '<h2 align=center>ПК: '+socket.gethostname() + ' в ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
-        SbHTML = SbHTML + """
-        <html>
-        <table border=1 align=center>
-        <tr><td> Имя файла
-        <td> Тип
-        <td> Размер
-        </tr>
+            <table border=1 align=center>
+            <tr><td> Имя файла
+            <td> Тип
+            <td> Размер
+            </tr>
+                """
+            s2 = """
+            </table>
+            <p align=center>Официальный сайт: <a href="https://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
+            </html>
             """
+            msgmed7 = "Укажите куда необходимо сохранить отчет?"
+            msgmed8 = "Файл сохранен"
+            msgmed9 = "Файл успешно сохранен: "
+            msgmed10 = "Не удалось сохранить"
+            msgmed11 = "Не удалось сохранить файл: "
+        else:
+            SbHTML="""
+                 <html>
+                 <head>
+                 </head>
+             <h1 align=center>LicenceChecker media search report</h1>"""
+            SbHTML = SbHTML + '<h2 align=center>PC: '+socket.gethostname() + ' at ' + datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S") +'</h1>'
+            SbHTML = SbHTML + """
+             <html>
+             <table border=1 align=center>
+             <tr><td> File name
+             <td> Type
+             <td> Size
+             </tr>
+                 """
+            s2="""
+             </table>
+             <p align=center>Official site: <a href="https://openwinsoft.org/">openwinsoft.org</a></p>
+             </html>
+             """
+            msgmed7 = "Where do you want to save the report?"
+            msgmed8 = "File Saved"
+            msgmed9 = "File saved successfully: "
+            msgmed10 = "Failed to save"
+            msgmed11 = "Failed to save file: "
         s=''
         s1=''
         for itemsoft in slovarMediaSave:
             s = slovarMediaSave[itemsoft]
             s1 = '<tr><td> ' + s['File'] + '\n' + '<td> ' + s['Tip'] + '\n' + '<td> ' + s['Size'] + '\n'
             SbHTML = SbHTML + s1
-        s2 = """
-            </table>
-            <p align=center>Официальный сайт: <a href="http://xn--90abhbolvbbfgb9aje4m.xn--p1ai/">КонтинентСвободы.рф</a></p>
-            </html>
-            """
         SbHTML = SbHTML + s2
         #ftypes = [('HTML', '.html')] #Указываю тип расширение
         options = QFileDialog.Options()
-        fileMediaName = QFileDialog.getSaveFileName(winMediaPoisk,"Укажите куда необходимо сохранить отчет?",".html","HTML файлы (*.html)", options=options)
+        fileMediaName = QFileDialog.getSaveFileName(winMediaPoisk, msgmed7,".html","HTML (*.html)", options=options)
         try:
             g = open(fileMediaName[0],'w+', encoding='utf-8')
             g.write(SbHTML) #Записываем в файл
             g.close()
-            QMessageBox.about(winMediaPoisk, "Файл сохранен", "Файл успешно сохранен: " + fileMediaName[0])
+            QMessageBox.about(winMediaPoisk, msgmed8, msgmed9 + fileMediaName[0])
         except:
-            QMessageBox.about(winMediaPoisk, "Не удалось сохранить", "Не удалось сохранить файл: " + fileMediaName[0])
+            QMessageBox.about(winMediaPoisk, msgmed10, msgmed11 + fileMediaName[0])
     winMediaPoisk.pbSave.clicked.connect(SaveMedia)
     winMediaPoisk.show()
 win.mMediaPoisk.triggered.connect(MediaPoisk)

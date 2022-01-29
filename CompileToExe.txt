@@ -2,4 +2,4 @@ pyinstaller --onedir --clean --noconsole --distpath=D:\LicenseChecker\Next\exe -
 
 cd /d D:\LicenseChecker\Next\
 
-C:\Python-x86\python.exe C:\Python-x86\Scripts\pyinstaller.exe
+D:\py32\python.exe D:\py32\Scripts\pyinstaller.exe
