@@ -9,7 +9,7 @@ The official web page of the program: <a href="https://www.mrkaban.ru/post/licen
 LicenseChecker is written using the Python 3.8.5 interpreter and the following libraries:
 altgraph cached-property certifi cffi chardet click cx-Freeze future htmltree idna jedi numpy parso pefile Pillow pip pluggy pycparser pycryptodome PyInstaller PyQt5 PyQt5-sip pyqt5-tools PySide2 python-dotenv python-typejsonrpc-server python-language-server pywin3c2 pywin32 requests setuptools shiboken2 six urllib3 wheel WMI
 
-Also take a look at the Wiki page <a href="[https://www.mrkaban.ru/post/licensechecker/](https://github.com/mrkaban/LicenseChecker/wiki)">https://github.com/mrkaban/LicenseChecker/wiki</a>
+Also take a look at the Wiki page <a href="https://github.com/mrkaban/LicenseChecker/wiki">https://github.com/mrkaban/LicenseChecker/wiki</a>
 
 LicenseChecker - Программа для проверки легальности используемого программного обеспечения
 
@@ -20,4 +20,4 @@ LicenseChecker - Программа для проверки легальност
 LicenseChecker написана при помощи интерпретатора Python 3.8.5 и следующих бибилиотек: 
 altgraph cached-property certifi cffi chardet click cx-Freeze future htmltree idna jedi numpy parso pefile Pillow pip pluggy pycparser pycryptodome PyInstaller PyQt5 PyQt5-sip pyqt5-tools PySide2 python-dotenv python-jsonrpc-server python-language-server pywin32 pywin32-ctypes requests setuptools shiboken2 six urllib3 wheel WMI
 
-Обратите также внимание на Wiki-страницу <a href="[https://www.mrkaban.ru/post/licensechecker/](https://github.com/mrkaban/LicenseChecker/wiki)">https://github.com/mrkaban/LicenseChecker/wiki</a>
+Обратите также внимание на Wiki-страницу <a href="https://github.com/mrkaban/LicenseChecker/wiki">https://github.com/mrkaban/LicenseChecker/wiki</a>
