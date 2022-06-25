@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title></title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  <link href="/flask_site/static/img/favicon.png" rel="icon">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="/flask_site/static/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/69e2443572.js" crossorigin="anonymous"></script>
+  <link href="/flask_site/static/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="/flask_site/pygments.css">
+</head>
+<body>
+  <main id="main">
+
+<style>
+body::before {
+	background: #040404 url("/flask_site/static/img/portfolio/post.jpg");
+}
+</style>
+    <!-- ======= шаблон для поста ======= -->
+    <div id="portfolio-details" class="portfolio-details">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <h2 class="portfolio-title">Flask с нуля</h2>
+          </div>
+          <div class="col-lg-8 portfolio-info">
+            <h3></h3>
+            <ul>
+              <li><strong>Категория</strong>: Flask</li>
+              <li><strong>Проект</strong>: Курс по Flask для начинающих</li>
+              <li><strong>Статья опубликована</strong>: 2022-06-14</li>
+              <li><strong>Платформа</strong>: <a href="http://example.com">Flask Практикум</a></li>
+            </ul>
+            <p>
+              <p>Начать знакомство с Flask можно с создания простого приложения, которое выводит “Hello World”. Создаем новый файл main.py и вводим следующий код.</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s1">&#39;Hello World&#39;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Это приложение “Hello World”, созданное с помощью фреймворка Flask. Чтобы запустить main.py, нужно выполнить следующую команду:</p>
+<div class="codehilite"><pre><span></span><span class="p">(</span><span class="n">env</span><span class="p">)</span> <span class="n">python</span> <span class="n">main</span><span class="p">.</span><span class="n">py</span>
+<span class="n">Running</span> <span class="k">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mi">127</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span> <span class="p">(</span><span class="n">Press</span> <span class="n">CTRL</span><span class="o">+</span><span class="k">C</span> <span class="k">to</span> <span class="n">quit</span><span class="p">)</span>
+</pre></div>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div><!-- конец карточки -->
+  <!-- конец поста -->
+
+  </main>
+  <!-- Скрипты -->
+  <script src="/flask_site/static/assets/purecounter/purecounter.js"></script>
+  <script src="/flask_site/static/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/flask_site/static/assets/glightbox/js/glightbox.min.js"></script>
+  <script src="/flask_site/static/assets/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/flask_site/static/assets/swiper/swiper-bundle.min.js"></script>
+  <script src="/flask_site/static/assets/waypoints/noframework.waypoints.js"></script>
+  <script src="/flask_site/static/js/main.js"></script>
+</body>
+</html>
