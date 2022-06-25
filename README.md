@@ -4,7 +4,7 @@ LicenseChecker - A program for checking the legality of the software used
 
 The program has an automatic search with the ability to view detailed information about the found programs, manual search, media search, database browsing, updating the database and checking for new versions of the program. Completely in Russian.
 
-The official web page of the program: https://openwinsoft.org/licensechecker/
+The official web page of the program: <a href="https://www.mrkaban.ru/post/licensechecker/">www.mrkaban.ru/post/licensechecker</a>
 
 LicenseChecker is written using the Python 3.8.5 interpreter and the following libraries:
 altgraph cached-property certifi cffi chardet click cx-Freeze future htmltree idna jedi numpy parso pefile Pillow pip pluggy pycparser pycryptodome PyInstaller PyQt5 PyQt5-sip pyqt5-tools PySide2 python-dotenv python-typejsonrpc-server python-language-server pywin3c2 pywin32 requests setuptools shiboken2 six urllib3 wheel WMI
