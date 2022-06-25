@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title></title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  <link href="/flask_site/static/img/favicon.png" rel="icon">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="/flask_site/static/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/flask_site/static/assets/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/69e2443572.js" crossorigin="anonymous"></script>
+  <link href="/flask_site/static/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="/flask_site/pygments.css">
+</head>
+<body>
+  <main id="main">
+
+<style>
+body::before {
+	background: #040404 url("/flask_site/static/img/portfolio/post.jpg");
+}
+</style>
+    <!-- ======= шаблон для поста ======= -->
+    <div id="portfolio-details" class="portfolio-details">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <h2 class="portfolio-title">Парсим на Python</h2>
+          </div>
+          <div class="col-lg-8 portfolio-info">
+            <h3></h3>
+            <ul>
+              <li><strong>Категория</strong>: Python</li>
+              <li><strong>Проект</strong>: Курс по Python для начинающих</li>
+              <li><strong>Статья опубликована</strong>: 2022-06-10</li>
+              <li><strong>Платформа</strong>: <a href="http://example.com">Python Практикум</a></li>
+            </ul>
+            <p>
+              <p>Парсинг (синтаксический анализ) представляет собой процесс сопоставления последовательности слов или символов — так называемой формальной грамматике. Например, для строчки кода:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span>  <span class="kn">as</span> <span class="nn">plt</span>
+</pre></div>
+
+
+<p>имеет место следующая грамматика: сначала идёт ключевое слово import, потом название модуля или цепочка имён модулей, разделённых точкой, потом ключевое слово as, а за ним — наше название импортируемому модулю.</p>
+<p>В результате парсинга, например, может быть необходимо прийти к следующему выражению:</p>
+<div class="codehilite"><pre><span></span><span class="err">{</span> <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;matplotlib&#39;</span><span class="p">,</span> <span class="s1">&#39;pyplot&#39;</span> <span class="p">],</span> <span class="s1">&#39;as&#39;</span><span class="p">:</span> <span class="s1">&#39;plt&#39;</span> <span class="err">}</span>
+</pre></div>
+
+
+<p>Данное выражение представляет собой словарь Python, который имеет два ключа: 'import' и 'as'. Значением для ключа 'import' является список, в котором по порядку перечислены названия импортируемых модулей.</p>
+<p>Для парсинга как правило используют регулярные выражения. Для этого имеется модуль Python под названием re (regular expression — регулярное выражение). Если вам не доводилось работать с регулярными выражениями, их вид может вас испугать. Например, для строки кода 'import matplotlib.pyplot as plt' оно будет иметь вид:</p>
+<div class="codehilite"><pre><span></span><span class="sa">r</span><span class="s1">&#39;^[ \t]*import +\D+\.\D+ +as \D+&#39;</span>
+</pre></div>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div><!-- конец карточки -->
+  <!-- конец поста -->
+
+  </main>
+  <!-- Скрипты -->
+  <script src="/flask_site/static/assets/purecounter/purecounter.js"></script>
+  <script src="/flask_site/static/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/flask_site/static/assets/glightbox/js/glightbox.min.js"></script>
+  <script src="/flask_site/static/assets/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/flask_site/static/assets/swiper/swiper-bundle.min.js"></script>
+  <script src="/flask_site/static/assets/waypoints/noframework.waypoints.js"></script>
+  <script src="/flask_site/static/js/main.js"></script>
+</body>
+</html>
